@@ -37,7 +37,10 @@ const provider = testnetProvider;
 const privkey = "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e"
 const signer = new Wallet(
     privkey,
-    provider
+    provider,
+    {
+        filterDust: true, // optional, will default to true in a future release
+    }
 )
 // or create a random account and get the mnemonic
 // const signer = Wallet.createRandom(/*{ path = SLIP_BIP44_PATH }*/}).connect(provider);

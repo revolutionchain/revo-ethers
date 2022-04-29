@@ -27,7 +27,7 @@
   "version": "1.0.0",
   "main": "./build/main/index.js",
   "license": "",
-  "homepage": "https://github.com/earlgreytech/qtum-ethers",
+  "homepage": "https://github.com/qtumproject/qtum-ethers",
   "repository": {
       "type": "git",
       "url": "git@github.com:earlgreytech/qtum-ethers"

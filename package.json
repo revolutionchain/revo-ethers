@@ -24,7 +24,7 @@
     "wif": "^2.0.6"
   },
   "name": "qtum-ethers-wrapper",
-  "version": "0.1.7",
+  "version": "1.0.0",
   "main": "./build/main/index.js",
   "license": "",
   "homepage": "https://github.com/earlgreytech/qtum-ethers",

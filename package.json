@@ -30,7 +30,7 @@
   "homepage": "https://github.com/qtumproject/qtum-ethers",
   "repository": {
       "type": "git",
-      "url": "git@github.com:earlgreytech/qtum-ethers"
+      "url": "git@github.com:qtumproject/qtum-ethers"
   },
   "keywords": [
     "Ethereum",

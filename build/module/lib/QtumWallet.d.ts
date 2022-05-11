@@ -16,7 +16,7 @@ export declare class QtumWallet extends IntermediateWallet {
      * Override to build a raw QTUM transaction signing UTXO's
      */
     signTransaction(transaction: TransactionRequest): Promise<string>;
-    getUtxos(from?: string, neededAmount?: number): Promise<any[]>;
+    getUtxos(from?: string, neededAmount?: number, types?: string[]): Promise<any[]>;
     private do;
     getPrivateKey(): Buffer;
     getPrivateKeyString(): string;

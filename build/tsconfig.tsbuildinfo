@@ -757,8 +757,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/global-vars.ts": {
-        "version": "b0108d4fbc382c485e75f4b51a471445f453f828c6569594d59ebe07ad4929d1",
-        "signature": "3c7a96e931acc93996a659bcad39418495c722845bf0c6ccf4a5d7d09ca1487c",
+        "version": "3b70d1b0438751fb89395805eac24b4d79d944ed599d0e6724da342185d65245",
+        "signature": "0a30fa2cfe9fd8de2065a1f69209a4d4713a9134f92b6729b2fbbba067577bb5",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/bn.js/index.d.ts": {
@@ -792,8 +792,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/utils.ts": {
-        "version": "04c2f3e2929fa5d348e490f0a03f7ecbbf4ae8c1c1fd7399028c58d8a27a88c3",
-        "signature": "95c454248b038cf1e1adbb5a4d87b85fea47087f8f2a27b6497a35f71f131555",
+        "version": "ef793df2388f99563ce95af80a2e2445c180177b5602109cbf3fbae7fe9ed200",
+        "signature": "20c784a75c578af64c8b75e55e54bb14203c20f5aed09a8f1fa60a684be7bf89",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/ethereum-protocol/node_modules/bignumber.js/bignumber.d.ts": {
@@ -807,7 +807,7 @@
         "affectsGlobalScope": false
       },
       "../src/lib/QtumProvider.ts": {
-        "version": "c09d3cf02c1184eb4eb23b3601da83786cd4677e03727068db47d4550a9099ce",
+        "version": "a470b33721ab40f087790570fac5ec1db0cddd566f303903f4503362562be0c3",
         "signature": "cc0441a0735d42549ab315c369ed430057e192e3b17fedd19ba3cf071df9e741",
         "affectsGlobalScope": false
       },
@@ -822,8 +822,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/QtumWallet.ts": {
-        "version": "31389231184c3c04b33666e0d4c9a9c233f60b4732330f226b8c815cda9d708f",
-        "signature": "db459437b1a7ff3c9870fcedaea75178e36349bdc6958e44c859ab7b1729a05b",
+        "version": "bcf123b5615bffb8f1644902fac1f882b4865a90da8872b76f247a2e49c73b81",
+        "signature": "d4dbcaee0a1fec13553c4de68c5e3ddce7382a2a78112439dfc152f5bbe4fec9",
         "affectsGlobalScope": false
       },
       "../src/lib/QtumTestProvider.ts": {

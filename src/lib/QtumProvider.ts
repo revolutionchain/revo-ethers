@@ -235,7 +235,7 @@ function QtumProviderMixin<TBase extends Constructor>(Base: TBase) {
         async getUtxos(from: string, neededAmount?: number) {
             // @ts-ignore
             await this.getNetwork();
-            const params = !!!neededAmount ? [from, neededAmount, "p2pkh"] : [from, "p2pkh"];
+            const params = !!!neededAmount ? [from, neededAmount, "p2pk", "p2pkh"] : [from, "p2pk", "p2pkh"];
             // @ts-ignore
             return await this.perform("qtum_qetUTXOs", params);
         }

@@ -152,8 +152,7 @@ export class QtumWallet extends IntermediateWallet {
 
         let utxos = [];
         try {
-            utxos = await this.getUtxos(tx.from, neededAmount);
-            // Grab vins for transaction object.
+            utxos = await this.getUtxos(tx.from, neededAmount, ["p2pk", "p2pkh"]);
         } catch (error: any) {
             if (forwardErrors.indexOf(error.code) >= 0) {
                 throw error;
@@ -170,8 +169,8 @@ export class QtumWallet extends IntermediateWallet {
         return await this.serializeTransaction(utxos, neededAmount, tx, transactionType);
     }
 
-    async getUtxos(from?: string, neededAmount?: number): Promise<any[]> {
-        const params = [from, neededAmount, "p2pkh"];
+    async getUtxos(from?: string, neededAmount?: number, types: string[] = ["p2pk", "p2pkh"]): Promise<any[]> {
+        const params = [from, neededAmount, ...types];
         if (!this.qtumProvider) {
             throw new Error("No provider defined");
         }

@@ -3,10 +3,11 @@ const TX_OVERHEAD_INPUT_COUNT = 1;
 const TX_OVERHEAD_OUTPUT_COUNT = 1;
 const TX_OVERHEAD_NLOCKTIME = 4;
 const TX_INPUT_OUTPOINT = 36;
-// up to 3 bytes for script sig for maximum length of 10000
+// scriptPubKey length (compactSize) The length of the scriptPubKey field. 1 vbyte for a script up to 252 vbytes. Maximum of 3 vbytes for a maximum-length script (10,000 vbytes).
 const TX_INPUT_SCRIPTSIGLENGTH = 1;
 const TX_INPUT_NSEQUENCE = 4;
 const TX_OUTPUT_NVALUE = 8;
+// scriptPubKey length (compactSize) The length of the scriptPubKey field. 1 vbyte for a script up to 252 vbytes. Maximum of 3 vbytes for a maximum-length script (10,000 vbytes).
 const TX_OUTPUT_SCRIPTPUBKEYLENGTH = 1;
 
 export const GLOBAL_VARS = {
@@ -21,6 +22,8 @@ export const GLOBAL_VARS = {
 
     TX_OVERHEAD_OUTPUT_COUNT: TX_OVERHEAD_OUTPUT_COUNT,
 
+    // ecdsa_signature (72) (about half of all signatures generated with a random nonce are this size, about half are one byte smaller, and a small percentage are smaller than that)
+    TX_INPUT_SCRIPTSIG_P2PK: 73,
     TX_INPUT_SCRIPTSIG_P2PKH: 107,
     TX_INPUT_SCRIPTSIG_P2SH2OF3: 254,
 

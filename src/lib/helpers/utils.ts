@@ -261,6 +261,18 @@ export async function signp2pkhWith(tx: any, vindex: number, signer: Function): 
     // encode sig
     return encodeSig(sig.signature, GLOBAL_VARS.HASH_TYPE);
 }
+
+export function p2pkScriptSig(sig: any): Buffer {
+    return bitcoinjs.script.compile([sig]);
+}
+
+export function p2pkScript(pubKey: Buffer): Buffer {
+    return bitcoinjs.script.compile([
+        pubKey,
+        OPS.OP_CHECKSIG
+    ]);
+}
+
 export function p2pkhScriptSig(sig: any, pubkey: any): Buffer {
     return bitcoinjs.script.compile([sig, Buffer.from(pubkey, 'hex')]);
 }
@@ -323,7 +335,15 @@ export function generateContractAddress(txid: string) {
     return getAddress(secondHash).substring(2);
 }
 
-export async function addVins(outputs: Array<any>, spendableUtxos: Array<ListUTXOs>, neededAmount: string, needChange: boolean, gasPriceString: string, hash160PubKey: string): Promise<Array<any>> {
+export async function addVins(
+    outputs: Array<any>,
+    spendableUtxos: Array<ListUTXOs>,
+    neededAmount: string,
+    needChange: boolean,
+    gasPriceString: string,
+    hash160PubKey: string,
+    publicKey: string
+): Promise<Array<any>> {
     // minimum gas price is 40 satoshi
     // minimum sat/kb is 4000
     const gasPrice = BigNumberEthers.from(gasPriceString);
@@ -334,11 +354,13 @@ export async function addVins(outputs: Array<any>, spendableUtxos: Array<ListUTX
 
     let inputs = [];
     let amounts = [];
+    let vinTypes = [];
     let change;
     let inputsAmount = BigNumberEthers.from(0);
     const neededAmountBN = BigNumberEthers.from(new BigNumber(qtumToSatoshi(neededAmount)).toString());
     let vbytes = BigNumberEthers.from(GLOBAL_VARS.TX_OVERHEAD_BASE);
     const spendVSizeLookupMap = {
+        p2pk: BigNumberEthers.from(GLOBAL_VARS.TX_INPUT_BASE + GLOBAL_VARS.TX_INPUT_SCRIPTSIG_P2PK).toNumber(),
         p2pkh: BigNumberEthers.from(GLOBAL_VARS.TX_INPUT_BASE + GLOBAL_VARS.TX_INPUT_SCRIPTSIG_P2PKH).toNumber(),
     }
     const changeType = 'p2pkh';
@@ -381,7 +403,9 @@ export async function addVins(outputs: Array<any>, spendableUtxos: Array<ListUTX
         let script = Buffer.from(spendableUtxo.scriptPubKey);
         // all scripts will be p2pkh for now
         const typ: string = spendableUtxo.type || '';
-        if (typ.toLowerCase() === "p2pkh") {
+        if (typ.toLowerCase() === "p2pk") {
+            script = p2pkScript(Buffer.from(publicKey.split("0x")[1], "hex"));
+        } else if (typ.toLowerCase() === "p2pkh") {
             script = p2pkhScript(Buffer.from(hash160PubKey, "hex"));
         }
         if (!spendVSizeLookupMap.hasOwnProperty(typ.toLowerCase())) {
@@ -395,6 +419,7 @@ export async function addVins(outputs: Array<any>, spendableUtxos: Array<ListUTX
             script: script,
             scriptSig: null
         });
+        vinTypes.push(typ);
         // @ts-ignore
         const outputVSize: number = spendVSizeLookupMap[typ.toLowerCase()];
         vbytes = vbytes.add(outputVSize);
@@ -478,7 +503,7 @@ export async function addVins(outputs: Array<any>, spendableUtxos: Array<ListUTX
     const fee = BigNumberEthers.from(vbytes).mul(gasPrice);
     const availableAmount = inputsAmount.sub(fee).toNumber()
 
-    return [inputs, amounts, availableAmount, fee, change, changeType];
+    return [inputs, amounts, availableAmount, fee, change, changeType, vinTypes];
 }
 
 export function getMinNonDustValue(input: ListUTXOs, feePerByte: BigNumberish): number {
@@ -764,16 +789,17 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     const hash160PubKey = tx.from.split("0x")[1];
 
     // @ts-ignore
-    let vins, amounts, availableAmount, fee, changeAmount, changeType;
+    let vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes;
     try {
         // @ts-ignore
-        [vins, amounts, availableAmount, fee, changeAmount, changeType] = await addVins(
+        [vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes] = await addVins(
             vouts,
             spendableUtxos,
             neededAmount,
             needChange,
             satoshiPerByte.toString(),
             hash160PubKey,
+            publicKey,
         );
     } catch (e) {
         if (!neededAmountBN.eq(neededAmountMinusGasBN) || ((typeof e.message) === 'string' && e.message.indexOf('more satoshi') === -1)) {
@@ -784,13 +810,14 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
         const allSpendableUtxos = filterUtxos(await fetchUtxos(), satoshiPerByte, filterDust);
         const neededAmountMinusGas = satoshiToQtum(neededAmountMinusGasBN);
         // @ts-ignore
-        [vins, amounts, availableAmount, fee, changeAmount, changeType] = await addVins(
+        [vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes] = await addVins(
             vouts,
             allSpendableUtxos,
             neededAmountMinusGas,
             needChange,
             satoshiPerByte.toString(),
             hash160PubKey,
+            publicKey,
         );
     }
 
@@ -832,7 +859,11 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     // Sign necessary vins
     const updatedVins = [];
     for (let i = 0; i < qtumTx.vins.length; i++) {
-        updatedVins.push({ ...qtumTx.vins[i], ['scriptSig']: p2pkhScriptSig(await signp2pkhWith(qtumTx, i, signer), publicKey.split("0x")[1]) })
+        if (vinTypes[i].toLowerCase() === "p2pk")  {
+            updatedVins.push({ ...qtumTx.vins[i], ['scriptSig']: p2pkScriptSig(await signp2pkhWith(qtumTx, i, signer)) })
+        } else {
+            updatedVins.push({ ...qtumTx.vins[i], ['scriptSig']: p2pkhScriptSig(await signp2pkhWith(qtumTx, i, signer), publicKey.split("0x")[1]) })
+        }
     }
     qtumTx.vins = updatedVins
     // Build the serialized transaction string.

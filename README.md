@@ -109,4 +109,4 @@ Qtum estimate gas function is not perfect so eth_estimateGas has a 20% buffer fo
 
 Janus doesn't return a transaction receipt for p2pkh tx's
 
-This extension works with p2pkh scripts only and asks Janus for p2pkh scripts only
+This extension works with p2pk and p2pkh scripts only and asks Janus for p2pk and p2pkh scripts only

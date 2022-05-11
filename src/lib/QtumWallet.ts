@@ -2,20 +2,23 @@ import {
     resolveProperties,
     Logger,
 } from "ethers/lib/utils";
-import { Provider, TransactionRequest } from "@ethersproject/abstract-provider";
+import { /*Provider,*/ TransactionRequest } from "@ethersproject/abstract-provider";
 import { BigNumber } from "bignumber.js"
-import { BigNumber as BigNumberEthers } from "ethers";
-import { checkTransactionType, serializeTransaction } from './helpers/utils'
+import { BigNumber as BigNumberEthers/*, providers*/ } from "ethers";
+import {
+    configureQtumAddressGeneration,
+    checkTransactionType,
+    serializeTransaction
+} from './helpers/utils'
 import { GLOBAL_VARS } from './helpers/global-vars'
 import { IntermediateWallet } from './helpers/IntermediateWallet'
-import { computeAddress} from "./helpers/utils"
-import { defineReadOnly } from "@ethersproject/properties";
 import { decryptJsonWallet, decryptJsonWalletSync, ProgressCallback } from "@ethersproject/json-wallets";
 import { HDNode, entropyToMnemonic } from "@ethersproject/hdnode";
 import { arrayify, Bytes, concat, hexDataSlice } from "@ethersproject/bytes";
 import { randomBytes } from "@ethersproject/random";
 import { keccak256 } from "@ethersproject/keccak256";
 import { Wordlist } from "@ethersproject/wordlists";
+import { QtumProvider } from "./QtumProvider";
 
 const logger = new Logger("QtumWallet");
 const forwardErrors = [
@@ -31,17 +34,23 @@ export const QTUM_BIP44_PATH = "m/44'/88'/0'/0/0";
 // for more details, see: https://github.com/satoshilabs/slips/pull/196
 export const SLIP_BIP44_PATH = "m/44'/2301'/0'/0/0";
 export const defaultPath = SLIP_BIP44_PATH;
+const minimumGasPrice = "0x9502f9000";
 
 export class QtumWallet extends IntermediateWallet {
 
     private opts: any;
+    private readonly qtumProvider?: QtumProvider;
 
     constructor(privateKey: any, provider?: any, opts?: any) {
         if (provider && provider.filterDust) {
             opts = provider;
             provider = undefined;
         }
+        if (provider && !provider.getUtxos) {
+            // throw new Error("QtumWallet provider requires getUtxos method: see QtumProvider")
+        }
         super(privateKey, provider);
+        this.qtumProvider = provider;
         this.opts = opts || {};
     }
 
@@ -64,6 +73,9 @@ export class QtumWallet extends IntermediateWallet {
      */
     async signTransaction(transaction: TransactionRequest): Promise<string> {
         let gasBugFixed = true;
+        if (!this.provider) {
+          throw new Error("No provider set, cannot sign transaction");
+        }
         // @ts-ignore
         if (this.provider.isClientVersionGreaterThanEqualTo) {
             // @ts-ignore
@@ -87,7 +99,6 @@ export class QtumWallet extends IntermediateWallet {
                 logger.warn(message);
             }
         }
-
         if (!transaction.gasPrice) {
             let gasPrice = minimumGasPriceInWei;
             if (!gasBugFixed) {
@@ -108,6 +119,14 @@ export class QtumWallet extends IntermediateWallet {
                     transaction.gasPrice = minimumGasPriceInWei;
                 }
             }
+        }
+
+        if (BigNumberEthers.from(transaction.gasPrice).lt(BigNumberEthers.from(minimumGasPrice))) {
+            throw new Error(
+                "Gas price is too low (" + transaction.gasPrice + " - " + BigNumberEthers.from(transaction.gasPrice).toString() +
+                "), it needs to be greater than " + minimumGasPrice +
+                " (" + BigNumberEthers.from(minimumGasPrice).toString() + ") wei"
+            );
         }
 
         const gasPriceExponent = gasBugFixed ? 'e-10' : 'e-9'
@@ -133,8 +152,7 @@ export class QtumWallet extends IntermediateWallet {
 
         let utxos = [];
         try {
-            // @ts-ignore
-            utxos = await this.provider.getUtxos(tx.from, neededAmount);
+            utxos = await this.getUtxos(tx.from, neededAmount);
             // Grab vins for transaction object.
         } catch (error: any) {
             if (forwardErrors.indexOf(error.code) >= 0) {
@@ -152,8 +170,106 @@ export class QtumWallet extends IntermediateWallet {
         return await this.serializeTransaction(utxos, neededAmount, tx, transactionType);
     }
 
-    connect(provider: Provider): IntermediateWallet {
-        return new QtumWallet(this, provider);
+    async getUtxos(from?: string, neededAmount?: number): Promise<any[]> {
+        const params = [from, neededAmount, "p2pkh"];
+        if (!this.qtumProvider) {
+            throw new Error("No provider defined");
+        }
+
+        const result = await this.do("qtum_qetUTXOs", params);
+        if (result) {
+            if (result instanceof Array) {
+                return result as any[];
+            } else {
+                return [result];
+            }
+        }
+
+        return [];
+    }
+
+    private do(payload: any, params: any[]): Promise<unknown> {
+        // @ts-ignore
+        if (this.provider.prepareRequest) {
+            // @ts-ignore
+            const args = this.provider.prepareRequest(payload,  params);
+
+            if (args) {
+                payload = {
+                    method: args[0],
+                    params: args[1],
+                };
+                params = args[1];
+            }
+        }
+
+        // @ts-ignore
+        if (this.provider?.request) {
+            // @ts-ignore
+            return this.provider.request(payload, {params});
+        }
+
+        const next = (method: string): Promise<unknown> => {
+            return new Promise((resolve, reject) => {
+                // @ts-ignore
+                this.provider[method](
+                    {
+                        method: payload.method,
+                        params: payload.params,
+                    },
+                    undefined,
+                    (err: Error, result: any) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
+                    },
+                );
+            });
+        }
+
+        // @ts-ignore
+        if (this.provider?.handleRequest) {
+            return next('handleRequest');
+        // @ts-ignore
+        } else if (this.provider?.sendAsync) {
+            return next('sendAsync');
+        }
+
+        return Promise.reject(new Error("Unsupported provider"));
+    }
+
+    getPrivateKey(): Buffer {
+        return Buffer.from(this.privateKey);
+    }
+
+    getPrivateKeyString(): string {
+        return this.privateKey
+    }
+
+    getPublicKey(): Buffer {
+        return Buffer.from(this.publicKey);
+    }
+
+    getPublicKeyString(): string {
+        return this.publicKey;
+    }
+
+    getAddressBuffer(): Buffer {
+        return Buffer.from(this.getAddressString());
+    }
+
+    getAddressString(): string {
+        return (this.address || '').toLowerCase();
+    }
+
+    getChecksumAddressString(): string {
+        return this.address;
+    }
+
+    static fromPrivateKey(privateKey: string): QtumWallet {
+        return new QtumWallet(privateKey);
     }
 
     /**
@@ -192,9 +308,6 @@ export class QtumWallet extends IntermediateWallet {
     static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): IntermediateWallet {
         if (!path) { path = defaultPath; }
         const hdnode = HDNode.fromMnemonic(mnemonic, "", wordlist).derivePath(path)
-        // QTUM computes address from the public key differently than ethereum, ethereum uses keccak256 while QTUM uses ripemd160(sha256(compressedPublicKey))
-        // @ts-ignore
-        defineReadOnly(hdnode, "qtumAddress", computeAddress(hdnode.publicKey, true));
-        return new QtumWallet(hdnode);
+        return new QtumWallet(configureQtumAddressGeneration(hdnode));
     }
 }

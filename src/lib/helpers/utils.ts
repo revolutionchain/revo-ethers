@@ -1,4 +1,6 @@
 import { encode as encodeVaruint, encodingLength } from 'varuint-bitcoin';
+import { HDNode } from "@ethersproject/hdnode";
+import { defineReadOnly } from "@ethersproject/properties";
 import { encode } from 'bip66';
 import { OPS } from "./opcodes";
 import { GLOBAL_VARS } from "./global-vars";
@@ -640,6 +642,13 @@ export function computeAddressFromPublicKey(publicKey: string): string {
     return getAddress(`0x${prefixlessAddress}`);
 }
 
+export function configureQtumAddressGeneration(hdnode: HDNode): HDNode {
+    // QTUM computes address from the public key differently than ethereum, ethereum uses keccak256 while QTUM uses ripemd160(sha256(compressedPublicKey))
+    // @ts-ignore
+    defineReadOnly(hdnode, "qtumAddress", computeAddress(hdnode.publicKey, true));
+    return hdnode;
+}
+
 export function checkTransactionType(tx: TransactionRequest): CheckTransactionType {
     if (!!tx.to === false && (!!tx.value === false || BigNumberEthers.from(tx.value).toNumber() === 0) && !!tx.data === true) {
         const needed = new BigNumber(satoshiToQtum(tx.gasPrice)).times(BigNumberEthers.from(tx.gasLimit).toNumber()).toFixed(8).toString()
@@ -827,8 +836,7 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     }
     qtumTx.vins = updatedVins
     // Build the serialized transaction string.
-    const serialized = txToBuffer(qtumTx).toString('hex');
-    return serialized;
+    return txToBuffer(qtumTx).toString('hex');
 }
 
 function filterUtxos(utxos: Array<any>, satoshiPerByte: BigNumberish, filterDust: boolean): Array<any> {

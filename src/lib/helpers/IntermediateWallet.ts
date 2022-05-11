@@ -21,6 +21,8 @@ import wif from 'wif';
 export const version = "wallet/5.1.0";
 const logger = new Logger(version);
 
+type Constructor<T> = { new (): T }
+
 export const messagePrefix = "\x15Qtum Signed Message:\n";
 
 export function hashMessage(message: Bytes | string): string {
@@ -149,8 +151,8 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
         return Promise.resolve(this.address);
     }
 
-    connect(provider: Provider): IntermediateWallet {
-        return new IntermediateWallet(this, provider);
+    connect<T extends typeof IntermediateWallet>(provider: Provider): InstanceType<T> {
+        return new this.__proto__.constructor(this, provider);
     }
 
     signTransaction(transaction: TransactionRequest): Promise<string> {

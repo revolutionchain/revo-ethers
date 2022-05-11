@@ -19,7 +19,7 @@ export declare class IntermediateWallet extends Signer implements ExternallyOwne
     get publicKey(): string;
     get compressedPublicKey(): string;
     getAddress(): Promise<string>;
-    connect(provider: Provider): IntermediateWallet;
+    connect<T extends typeof IntermediateWallet>(provider: Provider): InstanceType<T>;
     signTransaction(transaction: TransactionRequest): Promise<string>;
     signMessage(message: Bytes | string): Promise<string>;
     signHash(message: Bytes | string): Promise<string>;

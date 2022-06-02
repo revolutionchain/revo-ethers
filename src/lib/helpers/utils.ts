@@ -706,7 +706,42 @@ export async function serializeTransaction(utxos: Array<any>, fetchUtxos: Functi
     return await serializeTransactionWith(utxos, fetchUtxos, neededAmount, tx, transactionType, signer, publicKey, filterDust);
 }
 
+const consumedUtxos: {[id: string]: boolean} = {};
+
+function getUtxoPK(utxo: any): string {
+    if (!utxo.hasOwnProperty('txid') || !utxo.hasOwnProperty('vout')) {
+        throw new Error('Unknown UTXO object type');
+    }
+    let txid = utxo.txid
+    if (typeof txid !== 'string') {
+        if (txid.toString) {
+            txid = txid.toString('hex');
+        }
+    }
+
+    if (!txid.startsWith("0x")) {
+        txid = "0x" + txid;
+    }
+
+    return txid + utxo.vout;
+}
+
+function isConsumedUtxo(utxo: ListUTXOs): boolean {
+    let id = getUtxoPK(utxo);
+    return consumedUtxos[id];
+}
+
+function consumeUtxos(utxo: ListUTXOs) {
+    const id = getUtxoPK(utxo);
+    if (consumedUtxos[id]) {
+        return;
+    }
+    consumedUtxos[id] = true;
+    setTimeout(() => delete consumedUtxos[id], 45000);
+}
+
 export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: TransactionRequest, transactionType: number, signer: Function, publicKey: string, filterDust: boolean): Promise<string> {
+    utxos = utxos.filter((utxo) => !isConsumedUtxo(utxo));
     // Building the QTUM tx that will eventually be serialized.
     let qtumTx: Tx = { version: 2, locktime: 0, vins: [], vouts: [] };
     // reduce precision in gasPrice to 1 satoshi
@@ -801,13 +836,17 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
             hash160PubKey,
             publicKey,
         );
-    } catch (e) {
+    } catch (e: any) {
         if (!neededAmountBN.eq(neededAmountMinusGasBN) || ((typeof e.message) === 'string' && e.message.indexOf('more satoshi') === -1)) {
             throw e;
         }
         // needs more satoshi, provide more inputs
         // we probably need to filter dust here since the above non-filtered dust failed, there should be more inputs here
-        const allSpendableUtxos = filterUtxos(await fetchUtxos(), satoshiPerByte, filterDust);
+        const allSpendableUtxos = filterUtxos(
+            await fetchUtxos(),
+            satoshiPerByte,
+            filterDust
+        ).filter((utxo) => !isConsumedUtxo(utxo));
         const neededAmountMinusGas = satoshiToQtum(neededAmountMinusGasBN);
         // @ts-ignore
         [vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes] = await addVins(
@@ -826,6 +865,8 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     }
 
     qtumTx.vins = vins;
+
+    vins.forEach(consumeUtxos);
 
     if (transactionType === GLOBAL_VARS.P2PKH) {
         // @ts-ignore

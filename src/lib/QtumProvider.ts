@@ -176,7 +176,7 @@ function QtumProviderMixin<TBase extends Constructor>(Base: TBase) {
             try {
                 // @ts-ignore
                 const hash = await this.perform("sendTransaction", {
-                signedTransaction: hexTx,
+                    signedTransaction: hexTx,
                 });
                 // Note: need to destructure return result here.
                 // @ts-ignore
@@ -202,12 +202,12 @@ function QtumProviderMixin<TBase extends Constructor>(Base: TBase) {
                 // 0.1.4, versions after this with a proper version string is 0.2.0
                 // this version contains a bug we have to work around
                 return {
-                name: "Janus",
-                version: "0.1.4",
-                major: 0,
-                minor: 1,
-                patch: 4,
-                system: "linux-amd64",
+                    name: "Janus",
+                    version: "0.1.4",
+                    major: 0,
+                    minor: 1,
+                    patch: 4,
+                    system: "linux-amd64",
                 };
             } else {
                 const versionInfo = version.split("/");

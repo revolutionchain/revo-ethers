@@ -121,7 +121,8 @@ export class QtumWallet extends IntermediateWallet {
             }
         }
 
-        if (BigNumberEthers.from(transaction.gasPrice).lt(BigNumberEthers.from(minimumGasPrice))) {
+        const inSatoshi = BigNumberEthers.from(transaction.gasPrice).lt(BigNumberEthers.from('100000'));
+        if (!inSatoshi && BigNumberEthers.from(transaction.gasPrice).lt(BigNumberEthers.from(minimumGasPrice))) {
             throw new Error(
                 "Gas price is too low (" + transaction.gasPrice + " - " + BigNumberEthers.from(transaction.gasPrice).toString() +
                 "), it needs to be greater than " + minimumGasPrice +
@@ -129,7 +130,7 @@ export class QtumWallet extends IntermediateWallet {
             );
         }
 
-        const gasPriceExponent = gasBugFixed ? 'e-10' : 'e-9'
+        const gasPriceExponent = inSatoshi ? 'e-0' : (gasBugFixed ? 'e-10' : 'e-9');
         // convert gasPrice into satoshi
         let gasPrice = new BigNumber(BigNumberEthers.from(transaction.gasPrice).toString() + gasPriceExponent);
         transaction.gasPrice = gasPrice.toNumber();

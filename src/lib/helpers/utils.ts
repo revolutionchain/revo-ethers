@@ -38,9 +38,11 @@ import { BigNumber as BigNumberEthers, BigNumberish } from "ethers";
 import { decode } from "./hex-decoder";
 import { computePublicKey } from "@ethersproject/signing-key";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
+import { QtumTransactionRequest } from './IntermediateWallet';
 
 // const toBuffer = require('typedarray-to-buffer')
 const bitcoinjs = require("bitcoinjs-lib");
+import { Transaction as BitcoinjsTransaction, TxInput } from "bitcoinjs-lib";
 
 // metamask BigNumber uses a different version so the API doesn't match up
 [
@@ -56,6 +58,13 @@ const bitcoinjs = require("bitcoinjs-lib");
         BigNumber.prototype[is] = BigNumber.prototype[methodName];
     }
 })
+
+export interface SerializeOptions {
+    filterDust: boolean,
+    disableConsumingUtxos: boolean,
+    ignoreInputs: Array<string>,
+    inputs: Array<string>,
+}
 
 export interface ListUTXOs {
     address: string,
@@ -349,7 +358,7 @@ export async function addVins(
     const gasPrice = BigNumberEthers.from(gasPriceString);
     const minimumSatoshiPerByte = 400;
     if (gasPrice.lt(BigNumberEthers.from(minimumSatoshiPerByte))) {
-        throw new Error("Gas price lower than minimum relay fee: " + gasPriceString + " => " + gasPrice.toString() + " < " + minimumSatoshiPerByte);
+        throw new Error("Gas price lower than minimum relay fee: " + gasPriceString + " < " + minimumSatoshiPerByte);
     }
 
     let inputs = [];
@@ -557,7 +566,7 @@ function shiftBy(amount: BigNumberish, byPowerOfTen: number): string {
     let amountString;
     if (typeof amount === "number") {
         amountString = `${amount}`;
-    } else if (typeof amount === 'string') {
+    } else if (typeof amount === 'string' && amount.indexOf("0x") !== 0) {
         amountString = amount;
     } else {
         amountString = BigNumberEthers.from(amount).toString();
@@ -699,16 +708,25 @@ export function checkTransactionType(tx: TransactionRequest): CheckTransactionTy
     }
 }
 
-export async function serializeTransaction(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: TransactionRequest, transactionType: number, privateKey: string, publicKey: string, filterDust: boolean): Promise<string> {
+export async function serializeTransaction(
+    utxos: Array<any>,
+    fetchUtxos: Function,
+    neededAmount: string,
+    tx: QtumTransactionRequest,
+    transactionType: number,
+    privateKey: string,
+    publicKey: string,
+    opts?: SerializeOptions,
+): Promise<string> {
     const signer = (hash: Uint8Array) => {
         return secp256k1Sign(hash, arrayify(privateKey));
     };
-    return await serializeTransactionWith(utxos, fetchUtxos, neededAmount, tx, transactionType, signer, publicKey, filterDust);
+    return await serializeTransactionWith(utxos, fetchUtxos, neededAmount, tx, transactionType, signer, publicKey, opts);
 }
 
 const consumedUtxos: {[id: string]: boolean} = {};
 
-function getUtxoPK(utxo: any): string {
+function getUtxoPK(utxo: any, reverse: boolean): string {
     if (!utxo.hasOwnProperty('txid') || !utxo.hasOwnProperty('vout')) {
         throw new Error('Unknown UTXO object type');
     }
@@ -723,25 +741,47 @@ function getUtxoPK(utxo: any): string {
         txid = "0x" + txid;
     }
 
-    return txid + utxo.vout;
+    if (reverse) {
+        txid = getTxIdFromHash(txid);
+    }
+
+    if (!txid.startsWith("0x")) {
+        txid = "0x" + txid;
+    }
+
+    return txid.toLowerCase() + String(utxo.vout).padStart(8, '0');
 }
 
 function isConsumedUtxo(utxo: ListUTXOs): boolean {
-    let id = getUtxoPK(utxo);
-    return consumedUtxos[id];
+    let id = getUtxoPK(utxo, false);
+    let reversed = getUtxoPK(utxo, true);
+    return consumedUtxos[id] || consumedUtxos[reversed];
 }
 
 function consumeUtxos(utxo: ListUTXOs) {
-    const id = getUtxoPK(utxo);
-    if (consumedUtxos[id]) {
+    const id = getUtxoPK(utxo, false);
+    const reversed = getUtxoPK(utxo, true);
+    if (consumedUtxos[id] || consumedUtxos[reversed]) {
         return;
     }
     consumedUtxos[id] = true;
-    setTimeout(() => delete consumedUtxos[id], 45000);
+    consumedUtxos[reversed] = true;
+    setTimeout(() => {
+        delete consumedUtxos[id];
+        delete consumedUtxos[reversed];
+    }, 45000);
 }
 
-export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: TransactionRequest, transactionType: number, signer: Function, publicKey: string, filterDust: boolean): Promise<string> {
-    utxos = utxos.filter((utxo) => !isConsumedUtxo(utxo));
+export async function serializeTransactionWith(
+    utxos: Array<any>,
+    fetchUtxos: Function,
+    neededAmount: string,
+    tx: QtumTransactionRequest,
+    transactionType: number,
+    signer: Function,
+    publicKey: string,
+    opts?: SerializeOptions,
+): Promise<string> {
     // Building the QTUM tx that will eventually be serialized.
     let qtumTx: Tx = { version: 2, locktime: 0, vins: [], vouts: [] };
     // reduce precision in gasPrice to 1 satoshi
@@ -760,7 +800,7 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     const nonContractTx = transactionType === GLOBAL_VARS.P2PKH;
     let neededAmountBN = BigNumberEthers.from(parseFloat(neededAmount + `e+8`));
     const neededAmountMinusGasBN = nonContractTx ? neededAmountBN.sub(gas) : neededAmountBN;
-    const spendableUtxos = filterUtxos(utxos, satoshiPerByte, filterDust);
+    const spendableUtxos = filterInputs(utxos, satoshiPerByte, tx.inputs || [], opts || {} as SerializeOptions);
 
     const vouts: any = [];
     let needChange = true;
@@ -842,11 +882,12 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
         }
         // needs more satoshi, provide more inputs
         // we probably need to filter dust here since the above non-filtered dust failed, there should be more inputs here
-        const allSpendableUtxos = filterUtxos(
+        const allSpendableUtxos = filterInputs(
             await fetchUtxos(),
             satoshiPerByte,
-            filterDust
-        ).filter((utxo) => !isConsumedUtxo(utxo));
+            tx.inputs || [],
+            opts || {} as SerializeOptions,
+        );
         const neededAmountMinusGas = satoshiToQtum(neededAmountMinusGasBN);
         // @ts-ignore
         [vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes] = await addVins(
@@ -866,7 +907,9 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
 
     qtumTx.vins = vins;
 
-    vins.forEach(consumeUtxos);
+    if (opts?.disableConsumingUtxos) {
+        vins.forEach(consumeUtxos);
+    }
 
     if (transactionType === GLOBAL_VARS.P2PKH) {
         // @ts-ignore
@@ -911,17 +954,81 @@ export async function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Fu
     return txToBuffer(qtumTx).toString('hex');
 }
 
-function filterUtxos(utxos: Array<any>, satoshiPerByte: BigNumberish, filterDust: boolean): Array<any> {
+// Iterate over list of inputs and if the input is a serialized transaction, decode it and add its inputs
+function normalizeInputs(utxos: Array<string>): Array<string> {
+    const inputs = new Array<string>();
+
+    for (let i = 0; i < utxos.length; i++) {
+        let input = utxos[i];
+        if (!input.startsWith('0x')) {
+            input = '0x' + input;
+        }
+
+        if (input.length === 74) {
+            // (txid|hash)+(vout of 8 length with leading 0s)
+            inputs.push(input);
+        } else {
+            // serialized tx?
+            try {
+                BitcoinjsTransaction.fromHex(input.substring(2)).ins.forEach(
+                    (currentValue: TxInput) => {
+                        let hash = currentValue.hash.toString('hex');
+                        if (hash.indexOf("0x") !== 0) {
+                            hash = "0x" + hash;
+                        }
+                        inputs.push(hash + String(currentValue.index).padStart(8, '0'));
+                    }
+                )
+            } catch (e) {
+                // unknown input format, this will error elsewhere
+                inputs.push(input)
+            }
+        }
+    }
+    
+    return inputs;
+}
+
+function filterInputs(utxos: Array<any>, satoshiPerByte: BigNumberish, utxosToUse: Array<string>, opts: SerializeOptions) {
+    if (opts.disableConsumingUtxos) {
+        // don't check consumed utxos
+    } else {
+        utxos = utxos.filter((utxo) => !isConsumedUtxo(utxo));
+    }
+    
+    if (opts.ignoreInputs) {
+        const ignoredInputsMap : {[key: string]: boolean} = {};
+        for (let i = 0; i < opts.ignoreInputs.length; i++) {
+            ignoredInputsMap[opts.ignoreInputs[i].toLowerCase()] = true;
+        }
+        utxos = utxos.filter((utxo) => !(ignoredInputsMap[getUtxoPK(utxo, false)] || ignoredInputsMap[getUtxoPK(utxo, true)]) );
+    }
+
+    if (utxosToUse.length === 0 && opts.inputs && opts.inputs.length > 0) {
+        utxosToUse = opts.inputs;
+    }
+
+    if (utxosToUse.length > 0) {
+        utxosToUse = normalizeInputs(utxosToUse);
+        const utxosToUseMap : {[key: string]: boolean} = {};
+        for (let i = 0; i < utxosToUse.length; i++) {
+            utxosToUseMap[utxosToUse[i]] = true;
+        }
+    
+        utxos = utxos.filter((utxo) => utxosToUseMap[getUtxoPK(utxo, false)] || utxosToUseMap[getUtxoPK(utxo, true)] );
+    }
+
     for (let i = 0; i < utxos.length; i++) {
         // @ts-ignore
         utxos[i].amountNumber = parseFloat(parseFloat(utxos[i].amount).toFixed(8));
     }
+
     return utxos.filter((utxo) => {
         if (utxo.safe === undefined || !utxo.safe) {
             // unsafe to spend utxo
             return false;
         }
-        if (filterDust) {
+        if (opts.filterDust) {
             // @ts-ignore
             const utxoValue = parseFloat(utxo.amountNumber + `e+8`);
             const minimumValueToNotBeDust = getMinNonDustValue(utxo, satoshiPerByte);
@@ -929,4 +1036,26 @@ function filterUtxos(utxos: Array<any>, satoshiPerByte: BigNumberish, filterDust
         }
         return true;
     });
+}
+
+export function getTxIdFromHash(hash: string): string {
+    if (hash.startsWith('0x')) {
+        hash = hash.substring(2);
+    }
+
+    return '0x' + reverseBuffer(Buffer.from(hash, 'hex')).toString('hex').toLowerCase();
+}
+
+export function reverseBuffer(buffer: Buffer) {
+    if (buffer.length < 1)
+        return buffer;
+    let j = buffer.length - 1;
+    let tmp = 0;
+    for (let i = 0; i < buffer.length / 2; i++) {
+        tmp = buffer[i];
+        buffer[i] = buffer[j];
+        buffer[j] = tmp;
+        j--;
+    }
+    return buffer;
 }

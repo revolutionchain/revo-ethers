@@ -1,25 +1,36 @@
 // @ts-nocheck
 import { getAddress } from "@ethersproject/address";
-import { Provider, TransactionRequest } from "@ethersproject/abstract-provider";
+import { Provider, TransactionRequest, TransactionResponse } from "@ethersproject/abstract-provider";
 import { ExternallyOwnedAccount, Signer, TypedDataDomain, TypedDataField, TypedDataSigner } from "@ethersproject/abstract-signer";
 import { arrayify, Bytes, BytesLike, concat, hexDataSlice, isHexString, joinSignature, SignatureLike } from "@ethersproject/bytes";
 import { _TypedDataEncoder } from "@ethersproject/hash";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { defaultPath, HDNode, entropyToMnemonic, Mnemonic } from "@ethersproject/hdnode";
 import { keccak256 } from "@ethersproject/keccak256";
-import { defineReadOnly, resolveProperties } from "@ethersproject/properties";
+import { Deferrable, defineReadOnly, resolveProperties, shallowCopy } from "@ethersproject/properties";
 import { randomBytes } from "@ethersproject/random";
 import { SigningKey } from "@ethersproject/signing-key";
 import { decryptJsonWallet, decryptJsonWalletSync, encryptKeystore, ProgressCallback } from "@ethersproject/json-wallets";
-import { serialize, UnsignedTransaction } from "@ethersproject/transactions";
+import {
+    serialize,
+    UnsignedTransaction,
+    AccessListish,
+    computeAddress as computeEthereumAddress,
+} from "@ethersproject/transactions";
 import { Wordlist } from "@ethersproject/wordlists";
 import { computeAddress, computeAddressFromPublicKey} from "./utils"
-import { computeAddress as computeEthereumAddress } from "@ethersproject/transactions";
 import { Logger } from "@ethersproject/logger";
 import secp256k1 from "secp256k1";
 import wif from 'wif';
+import { InputNonces } from "../QtumWallet";
+import { Transaction } from "bitcoinjs-lib";
+import { BigNumberish } from "ethers";
 export const version = "wallet/5.1.0";
 const logger = new Logger(version);
+
+const allowedTransactionKeys: Array<string> = [
+    "accessList", "chainId", "data", "from", "gasLimit", "gasPrice", "nonce", "to", "type", "value", "inputs"
+];
 
 type Constructor<T> = { new (): T }
 
@@ -55,8 +66,50 @@ function hasMnemonic(value: any): value is { mnemonic: Mnemonic } {
     const mnemonic = value.mnemonic;
     return (mnemonic && mnemonic.phrase);
 }
+
+/**
+ * Idempotency in Bitcoin forks requires spending the same Bitcoin inputs
+ * As long as one of the inputs has already been spent, then the request will fail
+ * This also means that sending multiple transactions in the same block requires
+ * that you specify which inputs to avoid for subsequent transactions so that
+ * you are not trying to double-spend the same inputs as the blockchain will
+ * reject one of the requests and you won't necessarily know which one will
+ * get rejected
+ * (this is how you would overwrite a transaction in the mempool - by increasing the fee)
+ */
+export interface IdempotentRequest {
+    // The nonce is the keccak hash of the sorted spent inputs
+    nonce: string,
+    // The list of inputs (txid OR hash) that are to be spent by this transaction
+    // (t)
+    // including this is optional for idempotency
+    // as when specifying the nonce, the transaction will throw
+    // if different inputs are used
+    inputs: Array<string>,
+    // The TransactionRequest with the updated nonce
+    transaction: QtumTransactionRequest,
+    signedTransaction: string,
+    // Send the transaction after storing the nonce somewhere for later requests
+    sendTransaction: () => Promise<TransactionResponse>,
+}
+
+export interface InputNonces {
+    nonce: string,
+    inputs: Array<string>,
+    decoded: Transaction,
+}
+
+export interface Idempotent {
+    getIdempotentNonce(signedTransaction: string): InputNonces,
+    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest>,
+}
+
+export type QtumTransactionRequest = TransactionRequest & {
+    inputs?: Array<string>;
+}
+
 // Created this class due to address being read only and unwriteable from derived classes.
-export class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner {
+export class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
 
     readonly address: string;
     readonly provider: Provider;
@@ -155,7 +208,34 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
         return new this.__proto__.constructor(this, provider);
     }
 
-    signTransaction(transaction: TransactionRequest): Promise<string> {
+    checkTransaction(transaction: Deferrable<TransactionRequest>): Deferrable<TransactionRequest> {
+        for (const key in transaction) {
+            if (allowedTransactionKeys.indexOf(key) === -1) {
+                logger.throwArgumentError("invalid transaction key: " + key, "transaction", transaction);
+            }
+        }
+
+        const tx = shallowCopy(transaction);
+
+        if (tx.from == null) {
+            tx.from = this.getAddress();
+        } else {
+            // Make sure any provided address matches this signer
+            tx.from = Promise.all([
+                Promise.resolve(tx.from),
+                this.getAddress()
+            ]).then((result) => {
+                if (result[0].toLowerCase() !== result[1].toLowerCase()) {
+                    logger.throwArgumentError("from address mismatch", "transaction", transaction);
+                }
+                return result[0];
+            });
+        }
+
+        return tx;
+    }
+
+    signTransaction(transaction: QtumTransactionRequest): Promise<string> {
         return resolveProperties(transaction).then((tx) => {
             if (tx.from != null) {
                 if (getAddress(tx.from) !== this.address) {
@@ -197,6 +277,27 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
         });
 
         return await this.signHash(_TypedDataEncoder.hash(populated.domain, types, populated.value));
+    }
+
+    abstract getIdempotentNonce(signedTransaction: string): InputNonces;
+
+    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest> {
+        this._checkProvider("sendTransaction");
+        return this.populateTransaction(transaction).then((tx) => {
+            return this.signTransaction(tx).then((signedTx) => {
+                const nonce = this.getIdempotentNonce(signedTx);
+                tx.nonce = nonce.nonce;
+                // @ts-ignore 
+                tx.inputs = nonce.inputs;
+                return {
+                    nonce: nonce.nonce,
+                    inputs: nonce.inputs,
+                    transaction: tx,
+                    signedTransaction: signedTx,
+                    sendTransaction: () => this.provider.sendTransaction(signedTx),
+                };
+            });
+        });
     }
 
     encrypt(password: Bytes | string, options?: any, progressCallback?: ProgressCallback): Promise<string> {

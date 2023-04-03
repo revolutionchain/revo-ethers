@@ -2,22 +2,23 @@ import {
     resolveProperties,
     Logger,
 } from "ethers/lib/utils";
-import { /*Provider,*/ TransactionRequest } from "@ethersproject/abstract-provider";
 import { BigNumber } from "bignumber.js"
 import { BigNumber as BigNumberEthers/*, providers*/ } from "ethers";
 import {
     configureQtumAddressGeneration,
     checkTransactionType,
-    serializeTransaction
+    serializeTransaction,
+    SerializeOptions
 } from './helpers/utils'
 import { GLOBAL_VARS } from './helpers/global-vars'
-import { IntermediateWallet } from './helpers/IntermediateWallet'
+import { InputNonces, IntermediateWallet, QtumTransactionRequest } from './helpers/IntermediateWallet'
 import { decryptJsonWallet, decryptJsonWalletSync, ProgressCallback } from "@ethersproject/json-wallets";
 import { HDNode, entropyToMnemonic } from "@ethersproject/hdnode";
 import { arrayify, Bytes, concat, hexDataSlice } from "@ethersproject/bytes";
 import { randomBytes } from "@ethersproject/random";
 import { keccak256 } from "@ethersproject/keccak256";
 import { Wordlist } from "@ethersproject/wordlists";
+import { Transaction, TxInput } from "bitcoinjs-lib";
 import { QtumProvider } from "./QtumProvider";
 
 const logger = new Logger("QtumWallet");
@@ -36,12 +37,36 @@ export const SLIP_BIP44_PATH = "m/44'/2301'/0'/0/0";
 export const defaultPath = SLIP_BIP44_PATH;
 const minimumGasPrice = "0x9502f9000";
 
+export interface QtumWalletOptions {
+    // filter dust (inputs that cost more to spend than they are worth)
+    filterDust: boolean,
+    // by default, there is an internal 45 second cooldown on spending inputs
+    // this allows sent transactions to be included in a block and show up in qtumd apis
+    // as being spent inputs so that they won't be re-used
+    disableConsumingUtxos: boolean,
+    // list of input hashs + vout indexes to ignore when creating transactions
+    ignoreInputs: Array<string>,
+    // list of inputs from which to use (if not used)
+    // adding this to individual transaction requests will override this value
+    // specifying them here allows you to specify inputs with libraries that for example
+    // interact directly with ethersjs and you are unable to modify the transaction request
+    inputs: Array<string>,
+    nonce: string,
+}
+
+export class IdempotencyError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'IdempotencyError';
+    }
+}
+
 export class QtumWallet extends IntermediateWallet {
 
-    private opts: any;
+    private opts: QtumWalletOptions;
     private readonly qtumProvider?: QtumProvider;
 
-    constructor(privateKey: any, provider?: any, opts?: any) {
+    constructor(privateKey: any, provider?: any, opts?: QtumWalletOptions) {
         if (provider && provider.filterDust) {
             opts = provider;
             provider = undefined;
@@ -51,10 +76,10 @@ export class QtumWallet extends IntermediateWallet {
         }
         super(privateKey, provider);
         this.qtumProvider = provider;
-        this.opts = opts || {};
+        this.opts = opts || {} as QtumWalletOptions;
     }
 
-    protected async serializeTransaction(utxos: Array<any>, neededAmount: string, tx: TransactionRequest, transactionType: number): Promise<string> {
+    protected async serializeTransaction(utxos: Array<any>, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, opts?: SerializeOptions): Promise<string> {
         return await serializeTransaction(
             utxos,
             // @ts-ignore
@@ -64,14 +89,41 @@ export class QtumWallet extends IntermediateWallet {
             transactionType,
             this.privateKey,
             this.compressedPublicKey,
-            this.opts.filterDust || false,
+            opts,
         );
+    }
+
+    getIdempotentNonce(serializedHexTransaction: string): InputNonces {
+        const transaction = Transaction.fromHex(serializedHexTransaction);
+        const inputs = transaction.ins.slice();
+        inputs.sort((a: TxInput, b: TxInput) => a.hash.compare(b.hash));
+
+        return {
+            nonce: keccak256(
+                inputs.reduce(
+                    (accumulator: string, currentValue: TxInput) => accumulator + currentValue.hash.toString('hex') + String(currentValue.index).padStart(8, '0'),
+                    "0x",
+                )
+            ),
+            inputs: inputs.reduce(
+                (accumulator: Array<string>, currentValue: TxInput) => {
+                    let hash = currentValue.hash.toString('hex');
+                    if (hash.indexOf("0x") !== 0) {
+                        hash = "0x" + hash;
+                    }
+                    accumulator.push(hash + String(currentValue.index).padStart(8, '0'));
+                    return accumulator;
+                },
+                [],
+            ),
+            decoded: transaction,
+        };
     }
 
     /**
      * Override to build a raw QTUM transaction signing UTXO's
      */
-    async signTransaction(transaction: TransactionRequest): Promise<string> {
+    async signTransaction(transaction: QtumTransactionRequest): Promise<string> {
         let gasBugFixed = true;
         if (!this.provider) {
           throw new Error("No provider set, cannot sign transaction");
@@ -167,7 +219,20 @@ export class QtumWallet extends IntermediateWallet {
             );
         }
 
-        return await this.serializeTransaction(utxos, neededAmount, tx, transactionType);
+        const serializedTransaction = await this.serializeTransaction(utxos, neededAmount, tx, transactionType, this.opts as SerializeOptions);
+
+        const nonce = (this.opts.nonce || transaction.nonce);
+        if (nonce) {
+            const nonceString = nonce + '';
+            if (nonceString.length === 66 && nonceString.startsWith('0x')) {
+                const inputNonces = this.getIdempotentNonce(serializedTransaction);
+                if (inputNonces.nonce !== nonce) {
+                    throw new IdempotencyError("Idempotency error, mismatching inputs, got: " + inputNonces.nonce + " requested: " + nonce);
+                }
+            }
+        }
+
+        return serializedTransaction;
     }
 
     async getUtxos(from?: string, neededAmount?: number, types: string[] = ["p2pk", "p2pkh"]): Promise<any[]> {

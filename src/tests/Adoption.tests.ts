@@ -8,7 +8,7 @@ const {
     QtumContractFactory,
 } = require("../../build/main/lib/QtumContractFactory");
 const { generateContractAddress } = require('../../build/main/lib/helpers/utils')
-const provider = new QtumProvider("http://localhost:23889");
+const provider = new QtumProvider("http://localhost:23890");
 
 // hash160PubKey/address -> 0xcdf409a70058bfc54ada1ee3422f1ef28d0d267d
 const signer = new QtumWallet(
@@ -84,14 +84,14 @@ describe("Adoption", function () {
         it("can deploy and adopt", async function () {
             const adoption = new QtumContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
             const deployment = await adoption.deploy({
-                gasPrice: "0x9502F9000"
+                gasPrice: "0x190"
             });
             expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
             await deployment.deployed();
             const contract = new ethers.Contract(deployment.address, ADOPTION_ABI, signer);
             for (let i = 0; i <= 1; i++) {
                 const adopt = await contract.adopt(0, {
-                    gasPrice: "0x9502F9000"
+                    gasPrice: "0x190"
                 });
                 await adopt.wait()
             }
@@ -105,13 +105,13 @@ describe("Adoption", function () {
         it("can deploy and adopt", async function () {
             const adoption = new QtumContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
             const deployment = await adoption.deploy({
-                gasPrice: "0x9502F9000"
+                gasPrice: "0x190"
             });
             expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
             await deployment.deployed();
             for (let i = 0; i <= 1; i++) {
                 const adopt = await deployment.adopt(0, {
-                    gasPrice: "0x9502F9000"
+                    gasPrice: "0x190"
                 });
                 await adopt.wait()
             }

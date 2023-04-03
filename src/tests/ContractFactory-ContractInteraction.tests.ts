@@ -10,12 +10,19 @@ const {
 const { generateContractAddress } = require('../../build/main/lib/helpers/utils')
 const BYTECODE = "608060405234801561001057600080fd5b506040516020806100f2833981016040525160005560bf806100336000396000f30060806040526004361060485763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166360fe47b18114604d5780636d4ce63c146064575b600080fd5b348015605857600080fd5b5060626004356088565b005b348015606f57600080fd5b506076608d565b60408051918252519081900360200190f35b600055565b600054905600a165627a7a7230582049a087087e1fc6da0b68ca259d45a2e369efcbb50e93f9b7fa3e198de6402b810029"
 const ABI = [{ "inputs": [], "name": "get", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }, { "inputs": [{ "internalType": "uint256", "name": "x", "type": "uint256" }], "name": "set", "outputs": [], "stateMutability": "nonpayable", "type": "function" }]
-const provider = new QtumProvider("http://localhost:23889");
+const provider = new QtumProvider("http://localhost:23890");
 
 // hash160PubKey/address -> 0xcdf409a70058bfc54ada1ee3422f1ef28d0d267d
 const signer = new QtumWallet(
     "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
     provider
+);
+const signerNoCache = new QtumWallet(
+    "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+    provider,
+    {
+        disableConsumingUtxos: true,
+    }
 );
 // hash160PubKey/address -> 0x30a41759e2fec594fbb90ea2b212c9ef8074e227
 const signerNoQtum = new QtumWallet(
@@ -398,16 +405,16 @@ describe("QtumContractFactory", function () {
     it("QtumContractFactory should deploy correctly given the deployer has enough QTUM to cover gas", async function () {
         const simpleStore = new QtumContractFactory(ABI, BYTECODE, signer);
         const deployment = await simpleStore.deploy({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
         await deployment.deployed();
         const getVal = await deployment.get({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         expect(BigNumber.from(getVal).toNumber()).to.equal(BigNumber.from("0x00").toNumber());
         const setVal = await deployment.set(1001, {
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         await setVal.wait()
         expect(BigNumber.from(getVal).toNumber()).to.equal(BigNumber.from("0x00").toNumber());
@@ -418,12 +425,12 @@ describe("QtumContractFactory", function () {
         if (!!connectedSimpleStore.signer) {
             const deployment = await connectedSimpleStore.deploy({
                 gasLimit: "0x2dc6c0",
-                gasPrice: "0x9502F9000",
+                gasPrice: "0x190",
             });
             expect(!!deployment.address, "true");
             await deployment.deployed();
             const getVal = await deployment.get({
-                gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+                gasLimit: "0x2dc6c0", gasPrice: "0x190"
             });
             expect(BigNumber.from(getVal).toNumber()).to.equal(BigNumber.from("0x00").toNumber());
         }
@@ -432,7 +439,7 @@ describe("QtumContractFactory", function () {
         const simpleStore = new QtumContractFactory(ABI, BYTECODE, signer);
         try {
             await simpleStore.deploy({
-                gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000", value: "0xffffff"
+                gasLimit: "0x2dc6c0", gasPrice: "0x190", value: "0xffffff"
             });
         } catch (err) {
             expect(err.reason).to.equal("You cannot send QTUM while deploying a contract. Try deploying again without a value.")
@@ -440,10 +447,9 @@ describe("QtumContractFactory", function () {
     });
     it("QtumContractFactory should fail as the deployer has no UTXOs to spend", async function () {
         const simpleStore = new QtumContractFactory(ABI, BYTECODE, signerNoQtum);
-        console.log(signerNoQtum.address)
         try {
             await simpleStore.deploy({
-                gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+                gasLimit: "0x2dc6c0", gasPrice: "0x190"
             });
         } catch (err) {
             expect(err.reason).to.equal("Needed amount of UTXO's exceed the total you own.")
@@ -460,11 +466,288 @@ describe("QtumWallet", function () {
             to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
             from: signer.address,
             gasLimit: "0x3d090",
-            gasPrice: "0x9502F9000",
+            gasPrice: "0x190",
             value: "0xfffff",
             data: "",
         });
-        expect(true, "true")
+    });
+    it("QtumWallet creates identical signed transactions", async function() {
+        const a = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+        const b = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        expect(a.signedTransaction).to.equal(b.signedTransaction, "expected identical tx");
+    });
+    it("QtumWallet fails when explicitly specifying zero inputs", async function() {
+        try {
+            await signerNoCache.sendTransactionIdempotent({
+                to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+                from: signer.address,
+                gasLimit: "0x3d090",
+                gasPrice: "0x190",
+                value: "0xfffff",
+                nonce: 1000,
+                data: "",
+                inputs: [],
+            });
+            throw new Error("Expected transaction creation to fail with no inputs specified");
+        } catch (e) {
+            // expected
+        }
+    });
+    it("QtumWallet allows specifying/ignoring inputs", async function() {
+        const a = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        const ignoredInputsSigner = new QtumWallet(
+            "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+            provider,
+            {
+                disableConsumingUtxos: true,
+                ignoreInputs: a.inputs,
+            }
+        );
+
+        const b = await ignoredInputsSigner.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        const c = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+            inputs: b.inputs,
+        });
+
+        expect(a.signedTransaction).to.not.equal(c.signedTransaction, "created identical tx");
+        expect(JSON.stringify(b.inputs)).to.equal(JSON.stringify(c.inputs), "expected identical inputs");
+        expect(JSON.stringify(a.inputs)).to.not.equal(JSON.stringify(c.inputs), "got identical inputs");
+    });
+    it("QtumWallet allows specifying inputs as a signed transaction", async function() {
+        const a = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        const ignoredInputsSigner = new QtumWallet(
+            "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+            provider,
+            {
+                disableConsumingUtxos: true,
+                ignoreInputs: a.inputs,
+            }
+        );
+
+        const b = await ignoredInputsSigner.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        const c = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+            inputs: [b.signedTransaction],
+        });
+
+        expect(a.signedTransaction).to.not.equal(c.signedTransaction, "created identical tx");
+        expect(JSON.stringify(b.inputs)).to.equal(JSON.stringify(c.inputs), "expected identical inputs");
+        expect(JSON.stringify(a.inputs)).to.not.equal(JSON.stringify(c.inputs), "got identical inputs");
+    });
+    it("QtumWallet allows enforces hashes of inputs as nonce", async function() {
+        const a = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        const nonceSigner = new QtumWallet(
+            "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+            provider,
+            {
+                disableConsumingUtxos: true,
+                nonce: a.nonce,
+            }
+        );
+
+        const b = await nonceSigner.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            data: "",
+        });
+
+        const nonceSignerIgnoredInputs = new QtumWallet(
+            "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+            provider,
+            {
+                disableConsumingUtxos: true,
+                nonce: a.nonce,
+                ignoreInputs: a.inputs,
+            }
+        );
+
+        let success = true;
+        try {
+            await nonceSignerIgnoredInputs.sendTransactionIdempotent({
+                to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+                from: signer.address,
+                gasLimit: "0x3d090",
+                gasPrice: "0x190",
+                value: "0xfffff",
+                data: "",
+            });
+        } catch (e) {
+            expect(e.name).to.equal('IdempotencyError', "Got wrong error type");
+            success = false;
+        }
+
+        success = true;
+        try {
+            const signerIgnoredInputs = new QtumWallet(
+                "99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e",
+                provider,
+                {
+                    disableConsumingUtxos: true,
+                    ignoreInputs: a.inputs,
+                }
+            );
+
+            await signerIgnoredInputs.sendTransactionIdempotent({
+                to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+                from: signer.address,
+                gasLimit: "0x3d090",
+                gasPrice: "0x190",
+                value: "0xfffff",
+                data: "",
+                nonce: a.nonce,
+            });
+        } catch (e) {
+            expect(e.name).to.equal('IdempotencyError', "Got wrong error type");
+            success = false;
+        }
+
+        expect(success).to.equal(false, "expected error here");
+    });
+    it("QtumWallet can send valid transactions to hash160 addresses idempotently", async function () {
+        // sending to 0x7926223070547D2D15b2eF5e7383E541c338FfE9
+        // note: no tx receipt here
+        const idempotent = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            nonce: 1000,
+            data: "",
+        });
+
+        // craft a second transaction with the same inputs but with -1 value so its not identical
+        const idempotentWithReusedInputs = await signerNoCache.sendTransactionIdempotent({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xffffe",
+            nonce: 1000,
+            data: "",
+            inputs: idempotent.inputs,
+        });
+
+        expect(idempotent.signedTransaction).to.not.equal(idempotentWithReusedInputs.signedTransaction, "created identical tx");
+
+        const idempotentTransactionReceipt = await idempotent.sendTransaction();
+        await idempotentTransactionReceipt.wait(1);
+        try {
+            const txReceipt = await idempotentWithReusedInputs.sendTransaction();
+            await txReceipt.wait(1);
+            throw new Error("double spend");
+        } catch (e) {
+            expect(e).to.not.equal(undefined, "expected error");
+        }
+
+        try {
+            const tx = await signerNoCache.sendTransaction({
+                to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+                from: signer.address,
+                gasLimit: "0x3d090",
+                gasPrice: "0x190",
+                value: "0xfffff",
+                data: "",
+                // inputs: idempotent.inputs,
+                nonce: idempotent.nonce,
+            });
+            await tx.wait(1);
+            throw new Error("expected IdempotencyError");
+        } catch (e) {
+            expect(e.name).to.equal('IdempotencyError', "Got wrong error type");
+        }
+
+        await signer.sendTransaction({
+            to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+            from: signer.address,
+            gasLimit: "0x3d090",
+            gasPrice: "0x190",
+            value: "0xfffff",
+            data: "",
+            // fake nonce ignored by the idempotency functionality
+            nonce: 10000,
+        });
+
+        // test sending duplicate signed tx
+        const txResponse = await provider.sendTransaction(idempotent.signedTransaction);
     });
     it("QtumWallet can call getAddress method with a valid private key provided to the signer", async function () {
         const address = await signer.getAddress();
@@ -473,36 +756,36 @@ describe("QtumWallet", function () {
     it("QtumWallet can connect to SimpleBank and call a payable method", async function () {
         const simpleBank = new QtumContractFactory(SIMPLEBANK_ABI, SIMPLEBANK_BYTECODE, signer);
         const deployment = await simpleBank.deploy({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
         await deployment.deployed();
         const deposit = await deployment.deposit({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000", value: "0xfffff"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190", value: "0xfffff"
         });
         await deposit.wait()
     });
     it("QtumWallet can connect to QRC20 ", async function () {
         const qrc20 = new QtumContractFactory(QRC20_ABI, QRC20_BYTECODE, signer);
         const deployment = await qrc20.deploy({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
         const tx = await deployment.deployed();
         const qrc200 = new ethers.Contract(tx.address, QRC20_ABI, signer);
-        const name = await qrc200.name({ gasPrice: "0x9502F9000" });
+        const name = await qrc200.name({ gasPrice: "0x190" });
         console.log(name, tx.address)
         expect(name).to.equal("QRC TEST");
     });
     it("QtumWallet can transfer QRC20 ", async function () {
         const qrc20 = new QtumContractFactory(QRC20_ABI, QRC20_BYTECODE, signer);
         const deployment = await qrc20.deploy({
-            gasLimit: "0x2dc6c0", gasPrice: "0x9502F9000"
+            gasLimit: "0x2dc6c0", gasPrice: "0x190"
         });
         expect(deployment.address).to.equal(`0x${generateContractAddress(deployment.deployTransaction.hash.split("0x")[1])}`)
         const tx = await deployment.deployed();
         const qrc200 = new ethers.Contract(tx.address, QRC20_ABI, signer);
-        await qrc200.transfer("0x30a41759e2fec594fbb90ea2b212c9ef8074e227", 1, { gasPrice: "0x9502F9000" });
+        await qrc200.transfer("0x30a41759e2fec594fbb90ea2b212c9ef8074e227", 1, { gasPrice: "0x190" });
         // console.log(name, tx.address)
         // expect(name).to.equal("QRC TEST");
     });
@@ -510,7 +793,6 @@ describe("QtumWallet", function () {
 
 describe("QtumProvider", function () {
     it("QtumProvider can grab UTXOs for an address", async function () {
-        const utxos = await provider.getUtxos("0x7926223070547D2D15b2eF5e7383E541c338FfE9", "1.0")
-        expect(true, "true")
+        await provider.getUtxos("0x7926223070547D2D15b2eF5e7383E541c338FfE9", "1.0");
     });
 })

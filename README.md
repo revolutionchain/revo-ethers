@@ -1,36 +1,6 @@
 # Qtum Ethers
 A module for using Qtum through an Ethers compliant library to make it simpler to use Qtum
 
-# Upgrading from 0.x.x => 1.x.x
-TLDR: Breaking change in gas price, if you hardcode gas price then update your code otherwise you are probably ok upgrading to this version
-
-This version has a breaking change in gas price
-Janus has a bug in eth_gasPrice that returns GWEI instead of WEI
-If you have hardcoded gas price in your code, you will need to update it from 0x9502f9000 to 0x5d21dba000
-If you rely on eth_gasPrice then nothing else should be required
-
-This release also works around the bug in Janus and will detect when it is fixed and act correctly
-The worst case scenario to not upgrading to this release is when the Janus server you talk to gets upgrade
-your transactions will have higher transaction fees as eth_gasPrice will return a larger number
-
-Keep in mind that Qtum rejects transactions with absurdly high transaction fees, so the network will prevent
-accidental out of control spending by rejecting transactions - though this bug will not increase fees anywhere near that
-
-We will be deploying bugfixed Janus to our mainnet server fleet
-
-This release also improves transaction fee calculation and will result in lower transaction fees
-
-Upgrading to this version will warn you when creating transactions with Janus instances that have not been upgraded after May 30th, 2022
-
-**After August 1st 2022, the warnings will turn into errors and you will be unable to create transactions with old Janus instances**
-
-# Upgrading from 0.0.3 => 0.1.x
-public key address generation now follows QTUM behavior, the same private keys will now generate different addresses
-
-adds support for importing WIF private keys
-
-gas price is now specified in WEI, not Satoshis
-
 # Installation
 
 Open a console and run 
@@ -52,8 +22,9 @@ import {
 const mainnetProvider = new Provider("https://janus.qiswap.com/api/");
 const testnetProvider = new Provider("https://testnet-janus.qiswap.com/api/");
 // or deploy your own node locally with a regtest network
-// see for a pre-built docker image https://hub.docker.com/r/ripply/janus
+// see for a pre-built docker image https://hub.docker.com/r/qtump/janus
 const regtestProvider = new Provider("http://localhost:23889");
+// or register an account with qnode https://qnode.qtum.info
 
 const provider = testnetProvider;
 // create a wallet
@@ -62,7 +33,22 @@ const signer = new Wallet(
     privkey,
     provider,
     {
-        filterDust: true, // optional, will default to true in a future release
+        // optional, will default to true in a future release
+        filterDust: true,
+        // optional, disable remembering which UTXOs we consume
+        // so that we can avoid trying to spend them again while
+        // new transactions are in the mempool trying to spend them.
+        // having this enabled lets the library send multiple
+        // transactions per block.
+        disableConsumingUtxos: true,
+        // optional, specify inputs to ignore when creating transactions
+        // this list can be created from a serialized hex transaction via
+        // QtumWallet#getIdempotentNonce.inputs
+        ignoreInputs: [''],
+        // list of inputs to force, throws if unable to use them (eg they are already spent)
+        inputs: [''],
+        // hash of inputs, throws if a transaction does not re-use the exact same inputs
+        nonce: '',
     }
 )
 // or create a random account and get the mnemonic
@@ -79,7 +65,7 @@ const simpleStore = new ContractFactory(ABI, BYTECODE, signer);
 async function deployToken() {
     const deployment = await simpleStore.deploy({
         gasLimit: "0x7a120", // 500,000
-        gasPrice: "0x5d21dba000" // in WEI, not Satoshis
+        gasPrice: "0x190" // in WEI OR Satoshis
     });
     await deployment.deployed();
     return deployment.address
@@ -90,7 +76,7 @@ async function transferToken(contractAddress, from, to, value) {
     const name = await qrc20.transfer(from, to, value,
         {
             gasLimit: "0x62521", // 62521
-            gasPrice: "0x5d21dba000", // in WEI, not Satoshis
+            gasPrice: "0x5d21dba000", // in WEI OR Satoshis (0x190)
         }
     );
 }
@@ -98,8 +84,77 @@ async function transferToken(contractAddress, from, to, value) {
 const contractAddress = await deployToken();
 await transferToken(contractAddress, "0x...", "0x...", 1);
 
+// sending QTUM
+await signer.sendTransaction({
+    to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+    from: signer.address,
+    gasLimit: "0x3d090",
+    gasPrice: "0x190",
+    // in Satoshis
+    value: "0xfffff",
+    data: "",
+});
 ```
 
+# Idempotency
+
+Idempotency in Bitcoin forks involves tying logic to specific UTXO inputs or re-sending the raw serialized transaction and re-crafting a new transaction if that one fails.
+
+This can be done by specifying inputs to use and a special nonce.
+
+The nonce is a hash of each UTXO input in the created transaction.
+
+You will need to keep track of what inputs are attached to what transaction and you can continue sending the transaction
+
+```js
+const tx = await signer.sendTransaction({
+    to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+    from: signer.address,
+    gasLimit: "0x3d090",
+    gasPrice: "0x190",
+    // in Satoshis
+    value: "0xfffff",
+    data: "",
+});
+console.log("Generated hash of inputs:", tx.nonce);
+console.log("Inputs of transaction:", JSON.stringify(tx.inputs));
+console.log("bitcoinjs-lib decoded transaction:", tx.decoded);
+console.log("raw serialized signed transaction:", tx.signedTransaction);
+// save the signed transaction to your database
+// you can re-send the signed transaction as many times as you want and it will always be idempotent
+// send the transaction and get a transaction response
+const transactionResponse = await tx.sendTransaction();
+
+// re-send the raw signed transaction
+const transactionResponse = await provider.sendTransaction(tx.signedTransaction);
+
+// create a transaction while requiring specific inputs
+const txWithoutInputRequirements = await signer.sendTransactionIdempotent({
+    to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+    from: signer.address,
+    gasLimit: "0x3d090",
+    gasPrice: "0x190",
+    // in Satoshis
+    value: "0xfffff",
+    data: "",
+});
+console.log("Created transaction that uses these inputs:", JSON.stringify(txWithoutInputRequirements.inputs));
+console.log("Use this nonce to throw if the exact same inputs are not used:", txWithoutInputRequirements.nonce);
+const txWithInputRequirement = await signer.sendTransactionIdempotent({
+    to: "0x7926223070547D2D15b2eF5e7383E541c338FfE9",
+    from: signer.address,
+    gasLimit: "0x3d090",
+    gasPrice: "0x190",
+    // in Satoshis
+    value: "0xfffff",
+    data: "",
+    // you can specify inputs here or when creating an instance of QtumWallet
+    inputs: txWithoutInputRequirements.inputs,
+    // throw unless inputs match exactly
+    nonce: txWithoutInputRequirements.nonce,
+});
+const txReceipt = await txWithInputRequirement.sendTransaction();
+```
 
 # Notes
 

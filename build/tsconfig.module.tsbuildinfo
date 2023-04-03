@@ -791,9 +791,139 @@
         "signature": "5e60c4aa675af5712547857a09d7dfc136d28c05f6f5d6fe8643e9f4a77aba14",
         "affectsGlobalScope": false
       },
+      "../node_modules/bip32/types/bip32.d.ts": {
+        "version": "25d0893cf285d63492c8a0506bec26ac7e4790d46b5c582a89dd5ab9bc248c7a",
+        "signature": "25d0893cf285d63492c8a0506bec26ac7e4790d46b5c582a89dd5ab9bc248c7a",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bip32/types/index.d.ts": {
+        "version": "f74fee4ed5f77ed9e8ee0b2b6105cd5f0f123b64bbeeee7be551ec65a89a0ef4",
+        "signature": "f74fee4ed5f77ed9e8ee0b2b6105cd5f0f123b64bbeeee7be551ec65a89a0ef4",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/networks.d.ts": {
+        "version": "692cce8a36696e9df80910c05ae3b34340c278bbba03701a9ae92ae038663824",
+        "signature": "692cce8a36696e9df80910c05ae3b34340c278bbba03701a9ae92ae038663824",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/address.d.ts": {
+        "version": "dc47575f1383a970e9b45f23f29e5578c25cc59b89c2661ac9d352d220b733d4",
+        "signature": "dc47575f1383a970e9b45f23f29e5578c25cc59b89c2661ac9d352d220b733d4",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/crypto.d.ts": {
+        "version": "f18cde15a2eaf67489dd4c6c868c9a3cdb08c6d3c37b9c271beed22eb8ab4323",
+        "signature": "f18cde15a2eaf67489dd4c6c868c9a3cdb08c6d3c37b9c271beed22eb8ab4323",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/ecpair.d.ts": {
+        "version": "155b2fa899add8ebefb392c63a59e12580e9f81b6373753718c76b4f75dd08cc",
+        "signature": "155b2fa899add8ebefb392c63a59e12580e9f81b6373753718c76b4f75dd08cc",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts": {
+        "version": "a29a7b9ade7876d0f527b716a5bc5c7bc84554d155577020441f2d3c735589be",
+        "signature": "a29a7b9ade7876d0f527b716a5bc5c7bc84554d155577020441f2d3c735589be",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts": {
+        "version": "9cd42ff83837551961fa8788f14bd3498306fb2c1d35358f2b6bf3af05bf0890",
+        "signature": "9cd42ff83837551961fa8788f14bd3498306fb2c1d35358f2b6bf3af05bf0890",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts": {
+        "version": "5e51773d5624b8c871d8d140c88f944466338673fbc60ac4bf409eb60e6665cf",
+        "signature": "5e51773d5624b8c871d8d140c88f944466338673fbc60ac4bf409eb60e6665cf",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts": {
+        "version": "39b10cd95b70bbdc1cf8c832002618c3f81cd980438fe5e3694d99286ef90911",
+        "signature": "39b10cd95b70bbdc1cf8c832002618c3f81cd980438fe5e3694d99286ef90911",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts": {
+        "version": "95244212208717085038a74378ea2a03e49c06a3a195b2826c01c978f14684c2",
+        "signature": "95244212208717085038a74378ea2a03e49c06a3a195b2826c01c978f14684c2",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts": {
+        "version": "7362eeca79ce50eb72b2a0149e323f6d64daf4fbc8067592310859622c3dbcfe",
+        "signature": "7362eeca79ce50eb72b2a0149e323f6d64daf4fbc8067592310859622c3dbcfe",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts": {
+        "version": "8c0a305a7b10513d9d07bf739456bf9845bd4336027c85442b674a417facb57a",
+        "signature": "8c0a305a7b10513d9d07bf739456bf9845bd4336027c85442b674a417facb57a",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/payments/index.d.ts": {
+        "version": "7dae784c958ab149adfd25dc3a4ee3809c4ee5a6dbe948152832c1e0bed8ca67",
+        "signature": "7dae784c958ab149adfd25dc3a4ee3809c4ee5a6dbe948152832c1e0bed8ca67",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/script_number.d.ts": {
+        "version": "9384949ebf7b17e40865b829c4ecd400993c33841f9f81ba5a1257637f6c3a2c",
+        "signature": "9384949ebf7b17e40865b829c4ecd400993c33841f9f81ba5a1257637f6c3a2c",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/script_signature.d.ts": {
+        "version": "4c4e60ad56dbda374239e8530567e2172497663cf3cd3c580278c4a805951fcc",
+        "signature": "4c4e60ad56dbda374239e8530567e2172497663cf3cd3c580278c4a805951fcc",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/script.d.ts": {
+        "version": "59056a54b748ff2b0bc59218622097fdbed6303131ee97bc1afa6ecbf84e4973",
+        "signature": "59056a54b748ff2b0bc59218622097fdbed6303131ee97bc1afa6ecbf84e4973",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/transaction.d.ts": {
+        "version": "82ff83826f78421b757cf9bc26b84dd8b5c046e69ab9aaca747caee001b5324e",
+        "signature": "82ff83826f78421b757cf9bc26b84dd8b5c046e69ab9aaca747caee001b5324e",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/block.d.ts": {
+        "version": "0665a83fce58dbcb36fe9a44f877b647510ab783bc3d9f29fdebdb9fc71355ad",
+        "signature": "0665a83fce58dbcb36fe9a44f877b647510ab783bc3d9f29fdebdb9fc71355ad",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bip174/src/lib/interfaces.d.ts": {
+        "version": "28fb03121a168f316264faaa3904381a3e902e008ab2e4350aefa5d9ccc48772",
+        "signature": "28fb03121a168f316264faaa3904381a3e902e008ab2e4350aefa5d9ccc48772",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bip174/src/lib/psbt.d.ts": {
+        "version": "3da723823982206178406b7c2b8570152c6347a047fa7e59fa46011d10ac26b6",
+        "signature": "3da723823982206178406b7c2b8570152c6347a047fa7e59fa46011d10ac26b6",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/psbt.d.ts": {
+        "version": "615fab155973bb4c1d0f09b5cb973b1521e3116bce3427282517dabf0fafce21",
+        "signature": "615fab155973bb4c1d0f09b5cb973b1521e3116bce3427282517dabf0fafce21",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts": {
+        "version": "a6d5136ee8e76a510e1fc0f231b2a8c7403ba41e37340404130bee8a73db7c25",
+        "signature": "a6d5136ee8e76a510e1fc0f231b2a8c7403ba41e37340404130bee8a73db7c25",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/bitcoinjs-lib/types/index.d.ts": {
+        "version": "10288db5d4a02e189e3acca1486b1182236d81a95158dd49b91c46ab57571d3d",
+        "signature": "10288db5d4a02e189e3acca1486b1182236d81a95158dd49b91c46ab57571d3d",
+        "affectsGlobalScope": false
+      },
+      "../src/lib/QtumWallet.ts": {
+        "version": "3c77e3ea8b2f35c3dc0818589631add24110d5adaec1834edf1aaaf75d2a09a8",
+        "signature": "901f5dfa6c26e306b3ebf39c4aa4fd7151a3f00f9c97f799101d7466e1f9c238",
+        "affectsGlobalScope": false
+      },
+      "../src/lib/helpers/IntermediateWallet.ts": {
+        "version": "c51f858da45bc06ba074dc6c59e3a0f8c603ecdb6265f2f1f5bafea292284781",
+        "signature": "832e8d78ba3dd0bdf931f41ce4aa94ba36f437230448440ac19fba30c835e5f0",
+        "affectsGlobalScope": false
+      },
       "../src/lib/helpers/utils.ts": {
-        "version": "e0f19bf599186b5b11a7c5f3c693a3a6170200b5608b1fbde16ac2c0378f5e62",
-        "signature": "20c784a75c578af64c8b75e55e54bb14203c20f5aed09a8f1fa60a684be7bf89",
+        "version": "e298e5050c967bf7de42cc33f9485ce03274b716a92bfc918232144eaa866663",
+        "signature": "bae5d873a2709be58ddff3b1208b4b88dfa142c19123a2d807528cc1b5e75b54",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/ethereum-protocol/node_modules/bignumber.js/bignumber.d.ts": {
@@ -814,16 +944,6 @@
       "../src/lib/QtumFunctionProvider.ts": {
         "version": "b5af4c7fd8124201839e3974e4aee456a120ba9bf506e638e731dcb6d6c3b484",
         "signature": "c5f4f8638f766685b0e52a173e377a3ac6272cadfd4ffd272bb6bc2e40bfc369",
-        "affectsGlobalScope": false
-      },
-      "../src/lib/helpers/IntermediateWallet.ts": {
-        "version": "845c8c3d3235696ed248e2de4fd858bfedd4de37ce3d4eed7c21ba388e8d6b22",
-        "signature": "99e86bd5c9fa62a2ff4d984c2832329849bf0f6ac22925c41297a33e87e5f987",
-        "affectsGlobalScope": false
-      },
-      "../src/lib/QtumWallet.ts": {
-        "version": "414dd0cd7e2eb44f178a69d947fd4af86a62db42e94ae20cbf320b272c0fb631",
-        "signature": "d4dbcaee0a1fec13553c4de68c5e3ddce7382a2a78112439dfc152f5bbe4fec9",
         "affectsGlobalScope": false
       },
       "../src/lib/QtumTestProvider.ts": {
@@ -877,13 +997,13 @@
         "affectsGlobalScope": false
       },
       "../src/tests/Adoption.tests.ts": {
-        "version": "fdc7201f3e9b225ad6055ed3031dc5849ba5ea8dd32b128828e40cd147ee92d0",
+        "version": "c4211a03b771a0ae71221beccb707459ef04b4039f7119fa1afe468d499d4c86",
         "signature": "e7ee052b24df860909bf77eabf8208d32420217eda8650ed8225f0def7b54de1",
         "affectsGlobalScope": true
       },
       "../src/tests/ContractFactory-ContractInteraction.tests.ts": {
-        "version": "e37354d77b88a9ee21fe4ee15fd2b4187e3436633b89041ddda6f6518918354b",
-        "signature": "8afcd458d74f799e530e49738b908eb8e7d1916a9107d836d9cd3b335eb58c43",
+        "version": "bf5e7bdc6bb2a4b2751dc5bf317ec6a1de245681cd79ff9449e11005668c7283",
+        "signature": "db01f03d91eb541f6d91cd9372ef270661542ccb9f83b5d33f8ac3aa5dd12d13",
         "affectsGlobalScope": true
       },
       "../node_modules/@types/mocha/index.d.ts": {
@@ -1378,6 +1498,89 @@
       "../node_modules/@types/secp256k1/index.d.ts": [
         "../node_modules/@types/node/index.d.ts"
       ],
+      "../node_modules/bip174/src/lib/interfaces.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/bip174/src/lib/psbt.d.ts": [
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/bip174/src/lib/interfaces.d.ts"
+      ],
+      "../node_modules/bip32/types/bip32.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/bip32/types/index.d.ts": [
+        "../node_modules/bip32/types/bip32.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/address.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/block.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/ecpair.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/index.d.ts": [
+        "../node_modules/bip32/types/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/address.d.ts",
+        "../node_modules/bitcoinjs-lib/types/block.d.ts",
+        "../node_modules/bitcoinjs-lib/types/crypto.d.ts",
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/psbt.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/index.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/psbt.d.ts": [
+        "../node_modules/bip174/src/lib/interfaces.d.ts",
+        "../node_modules/bip174/src/lib/psbt.d.ts",
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/script.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script_number.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script_signature.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
       "../node_modules/ethers/lib/ethers.d.ts": [
         "../node_modules/@ethersproject/abstract-signer/lib/index.d.ts",
         "../node_modules/@ethersproject/bignumber/lib/index.d.ts",
@@ -1467,7 +1670,6 @@
         "../src/lib/QtumWallet.ts"
       ],
       "../src/lib/QtumWallet.ts": [
-        "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
         "../node_modules/@ethersproject/json-wallets/lib/index.d.ts",
@@ -1475,6 +1677,7 @@
         "../node_modules/@ethersproject/random/lib/index.d.ts",
         "../node_modules/@ethersproject/wordlists/lib/index.d.ts",
         "../node_modules/bignumber.js/bignumber.d.ts",
+        "../node_modules/bitcoinjs-lib/types/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
         "../node_modules/ethers/lib/utils.d.ts",
         "../src/lib/QtumProvider.ts",
@@ -1503,6 +1706,9 @@
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
         "../node_modules/@ethersproject/wordlists/lib/index.d.ts",
         "../node_modules/@types/secp256k1/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/index.d.ts",
+        "../node_modules/ethers/lib/index.d.ts",
+        "../src/lib/QtumWallet.ts",
         "../src/lib/helpers/utils.ts"
       ],
       "../src/lib/helpers/buffer-cursor.ts": [
@@ -1517,9 +1723,11 @@
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
         "../node_modules/@types/secp256k1/index.d.ts",
         "../node_modules/bignumber.js/bignumber.d.ts",
+        "../node_modules/bitcoinjs-lib/types/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
         "../node_modules/ethers/lib/utils.d.ts",
         "../node_modules/hash.js/lib/hash.d.ts",
+        "../src/lib/helpers/IntermediateWallet.ts",
         "../src/lib/helpers/bip66.d.ts",
         "../src/lib/helpers/bitcoinjs-lib.d.ts",
         "../src/lib/helpers/buffer-cursor.ts",
@@ -1980,6 +2188,89 @@
       "../node_modules/@types/secp256k1/index.d.ts": [
         "../node_modules/@types/node/index.d.ts"
       ],
+      "../node_modules/bip174/src/lib/interfaces.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/bip174/src/lib/psbt.d.ts": [
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/bip174/src/lib/interfaces.d.ts"
+      ],
+      "../node_modules/bip32/types/bip32.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/bip32/types/index.d.ts": [
+        "../node_modules/bip32/types/bip32.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/address.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/block.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/ecpair.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/index.d.ts": [
+        "../node_modules/bip32/types/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/address.d.ts",
+        "../node_modules/bitcoinjs-lib/types/block.d.ts",
+        "../node_modules/bitcoinjs-lib/types/crypto.d.ts",
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/psbt.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/index.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts",
+        "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/psbt.d.ts": [
+        "../node_modules/bip174/src/lib/interfaces.d.ts",
+        "../node_modules/bip174/src/lib/psbt.d.ts",
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/script.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/payments/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script_number.d.ts",
+        "../node_modules/bitcoinjs-lib/types/script_signature.d.ts"
+      ],
+      "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts": [
+        "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+        "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+        "../node_modules/bitcoinjs-lib/types/transaction.d.ts"
+      ],
       "../node_modules/ethers/lib/ethers.d.ts": [
         "../node_modules/@ethersproject/abstract-signer/lib/index.d.ts",
         "../node_modules/@ethersproject/bignumber/lib/index.d.ts",
@@ -2055,11 +2346,11 @@
         "../src/lib/QtumWallet.ts"
       ],
       "../src/lib/QtumWallet.ts": [
-        "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/json-wallets/lib/index.d.ts",
         "../node_modules/@ethersproject/wordlists/lib/index.d.ts",
-        "../src/lib/helpers/IntermediateWallet.ts"
+        "../src/lib/helpers/IntermediateWallet.ts",
+        "../src/lib/helpers/utils.ts"
       ],
       "../src/lib/helpers/IntermediateWallet.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
@@ -2067,15 +2358,19 @@
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
         "../node_modules/@ethersproject/json-wallets/lib/index.d.ts",
+        "../node_modules/@ethersproject/properties/lib/index.d.ts",
         "../node_modules/@ethersproject/signing-key/lib/index.d.ts",
-        "../node_modules/@ethersproject/wordlists/lib/index.d.ts"
+        "../node_modules/@ethersproject/wordlists/lib/index.d.ts",
+        "../node_modules/bitcoinjs-lib/types/index.d.ts",
+        "../src/lib/QtumWallet.ts"
       ],
       "../src/lib/helpers/utils.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
-        "../node_modules/ethers/lib/utils.d.ts"
+        "../node_modules/ethers/lib/utils.d.ts",
+        "../src/lib/helpers/IntermediateWallet.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -2203,6 +2498,30 @@
       "../node_modules/@types/node/zlib.d.ts",
       "../node_modules/@types/secp256k1/index.d.ts",
       "../node_modules/bignumber.js/bignumber.d.ts",
+      "../node_modules/bip174/src/lib/interfaces.d.ts",
+      "../node_modules/bip174/src/lib/psbt.d.ts",
+      "../node_modules/bip32/types/bip32.d.ts",
+      "../node_modules/bip32/types/index.d.ts",
+      "../node_modules/bitcoinjs-lib/types/address.d.ts",
+      "../node_modules/bitcoinjs-lib/types/block.d.ts",
+      "../node_modules/bitcoinjs-lib/types/crypto.d.ts",
+      "../node_modules/bitcoinjs-lib/types/ecpair.d.ts",
+      "../node_modules/bitcoinjs-lib/types/index.d.ts",
+      "../node_modules/bitcoinjs-lib/types/networks.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/embed.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/index.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2ms.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2pk.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2pkh.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2sh.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2wpkh.d.ts",
+      "../node_modules/bitcoinjs-lib/types/payments/p2wsh.d.ts",
+      "../node_modules/bitcoinjs-lib/types/psbt.d.ts",
+      "../node_modules/bitcoinjs-lib/types/script.d.ts",
+      "../node_modules/bitcoinjs-lib/types/script_number.d.ts",
+      "../node_modules/bitcoinjs-lib/types/script_signature.d.ts",
+      "../node_modules/bitcoinjs-lib/types/transaction.d.ts",
+      "../node_modules/bitcoinjs-lib/types/transaction_builder.d.ts",
       "../node_modules/ethers/lib/_version.d.ts",
       "../node_modules/ethers/lib/ethers.d.ts",
       "../node_modules/ethers/lib/index.d.ts",

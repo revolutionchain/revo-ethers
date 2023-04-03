@@ -4,6 +4,13 @@ import { BytesLike } from "ethers/lib/utils";
 import { Transaction } from "@ethersproject/transactions";
 import { BigNumberish } from "ethers";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
+import { QtumTransactionRequest } from './IntermediateWallet';
+export interface SerializeOptions {
+    filterDust: boolean;
+    disableConsumingUtxos: boolean;
+    ignoreInputs: Array<string>;
+    inputs: Array<string>;
+}
 export interface ListUTXOs {
     address: string;
     txid: string;
@@ -79,5 +86,7 @@ export declare function computeAddress(key: BytesLike | string, compressed?: boo
 export declare function computeAddressFromPublicKey(publicKey: string): string;
 export declare function configureQtumAddressGeneration(hdnode: HDNode): HDNode;
 export declare function checkTransactionType(tx: TransactionRequest): CheckTransactionType;
-export declare function serializeTransaction(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: TransactionRequest, transactionType: number, privateKey: string, publicKey: string, filterDust: boolean): Promise<string>;
-export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: TransactionRequest, transactionType: number, signer: Function, publicKey: string, filterDust: boolean): Promise<string>;
+export declare function serializeTransaction(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, privateKey: string, publicKey: string, opts?: SerializeOptions): Promise<string>;
+export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, signer: Function, publicKey: string, opts?: SerializeOptions): Promise<string>;
+export declare function getTxIdFromHash(hash: string): string;
+export declare function reverseBuffer(buffer: Buffer): Buffer;

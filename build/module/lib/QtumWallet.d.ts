@@ -1,21 +1,32 @@
 /// <reference types="node" />
-import { /*Provider,*/ TransactionRequest } from "@ethersproject/abstract-provider";
-import { IntermediateWallet } from './helpers/IntermediateWallet';
+import { SerializeOptions } from './helpers/utils';
+import { InputNonces, IntermediateWallet, QtumTransactionRequest } from './helpers/IntermediateWallet';
 import { ProgressCallback } from "@ethersproject/json-wallets";
 import { Bytes } from "@ethersproject/bytes";
 import { Wordlist } from "@ethersproject/wordlists";
 export declare const QTUM_BIP44_PATH = "m/44'/88'/0'/0/0";
 export declare const SLIP_BIP44_PATH = "m/44'/2301'/0'/0/0";
 export declare const defaultPath = "m/44'/2301'/0'/0/0";
+export interface QtumWalletOptions {
+    filterDust: boolean;
+    disableConsumingUtxos: boolean;
+    ignoreInputs: Array<string>;
+    inputs: Array<string>;
+    nonce: string;
+}
+export declare class IdempotencyError extends Error {
+    constructor(message: string);
+}
 export declare class QtumWallet extends IntermediateWallet {
     private opts;
     private readonly qtumProvider?;
-    constructor(privateKey: any, provider?: any, opts?: any);
-    protected serializeTransaction(utxos: Array<any>, neededAmount: string, tx: TransactionRequest, transactionType: number): Promise<string>;
+    constructor(privateKey: any, provider?: any, opts?: QtumWalletOptions);
+    protected serializeTransaction(utxos: Array<any>, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, opts?: SerializeOptions): Promise<string>;
+    getIdempotentNonce(serializedHexTransaction: string): InputNonces;
     /**
      * Override to build a raw QTUM transaction signing UTXO's
      */
-    signTransaction(transaction: TransactionRequest): Promise<string>;
+    signTransaction(transaction: QtumTransactionRequest): Promise<string>;
     getUtxos(from?: string, neededAmount?: number, types?: string[]): Promise<any[]>;
     private do;
     getPrivateKey(): Buffer;

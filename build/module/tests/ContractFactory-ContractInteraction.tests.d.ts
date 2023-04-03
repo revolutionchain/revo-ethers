@@ -29,6 +29,7 @@ declare const ABI: ({
 })[];
 declare const provider: any;
 declare const signer: any;
+declare const signerNoCache: any;
 declare const signerNoQtum: any;
 declare const SIMPLEBANK_ABI: ({
     inputs: never[];

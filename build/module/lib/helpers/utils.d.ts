@@ -1,6 +1,8 @@
 /// <reference types="node" />
 import { HDNode } from "@ethersproject/hdnode";
-import { BytesLike } from "ethers/lib/utils";
+import { Bytes, BytesLike } from "ethers/lib/utils";
+import { SignatureLike } from "@ethersproject/bytes";
+import { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer";
 import { Transaction } from "@ethersproject/transactions";
 import { BigNumberish } from "ethers";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
@@ -90,3 +92,9 @@ export declare function serializeTransaction(utxos: Array<any>, fetchUtxos: Func
 export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, signer: Function, publicKey: string, opts?: SerializeOptions): Promise<string>;
 export declare function getTxIdFromHash(hash: string): string;
 export declare function reverseBuffer(buffer: Buffer): Buffer;
+export declare const messagePrefix = "\u0015Qtum Signed Message:\n";
+export declare function hashMessage(message: Bytes | string): string;
+export declare function verifyMessage(message: Bytes | string, signature: SignatureLike): string;
+export declare function verifyHash(message: Bytes | string, signature: SignatureLike): string;
+export declare function recoverAddress(digest: BytesLike, signature: SignatureLike): string;
+export declare function verifyTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string;

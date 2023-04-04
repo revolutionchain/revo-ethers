@@ -917,13 +917,13 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/IntermediateWallet.ts": {
-        "version": "c51f858da45bc06ba074dc6c59e3a0f8c603ecdb6265f2f1f5bafea292284781",
-        "signature": "832e8d78ba3dd0bdf931f41ce4aa94ba36f437230448440ac19fba30c835e5f0",
+        "version": "d196637fb744d6f064b5fe09d98864416977b21fb408fe06b323098ef730dab0",
+        "signature": "e9a93cf5c7ae384166b2046dbf146c18778058aeec6c699fa75b49a42318c28c",
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/utils.ts": {
-        "version": "e298e5050c967bf7de42cc33f9485ce03274b716a92bfc918232144eaa866663",
-        "signature": "bae5d873a2709be58ddff3b1208b4b88dfa142c19123a2d807528cc1b5e75b54",
+        "version": "11bc620ffba5890af6baae665883b845ce280a5d787008d7f9738eddb33cd57c",
+        "signature": "bcc274261047732ef2b21fe20aad2045365063dfcd36a898523628ac86870080",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/ethereum-protocol/node_modules/bignumber.js/bignumber.d.ts": {
@@ -1004,6 +1004,11 @@
       "../src/tests/ContractFactory-ContractInteraction.tests.ts": {
         "version": "bf5e7bdc6bb2a4b2751dc5bf317ec6a1de245681cd79ff9449e11005668c7283",
         "signature": "db01f03d91eb541f6d91cd9372ef270661542ccb9f83b5d33f8ac3aa5dd12d13",
+        "affectsGlobalScope": true
+      },
+      "../src/tests/Utils.tests.ts": {
+        "version": "0fa95046519eda96513fb92fdb19b6f74fb72e3b4c27d3943b5def4f7d430da9",
+        "signature": "2659a6f82862138ca7d87816e28fd3b5b0a069e8f56dd82afc60e81f79ea4a05",
         "affectsGlobalScope": true
       },
       "../node_modules/@types/mocha/index.d.ts": {
@@ -1716,10 +1721,15 @@
       ],
       "../src/lib/helpers/utils.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
+        "../node_modules/@ethersproject/abstract-signer/lib/index.d.ts",
         "../node_modules/@ethersproject/address/lib/index.d.ts",
+        "../node_modules/@ethersproject/bytes/lib/index.d.ts",
+        "../node_modules/@ethersproject/hash/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
+        "../node_modules/@ethersproject/keccak256/lib/index.d.ts",
         "../node_modules/@ethersproject/properties/lib/index.d.ts",
         "../node_modules/@ethersproject/signing-key/lib/index.d.ts",
+        "../node_modules/@ethersproject/strings/lib/index.d.ts",
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
         "../node_modules/@types/secp256k1/index.d.ts",
         "../node_modules/bignumber.js/bignumber.d.ts",
@@ -2366,6 +2376,8 @@
       ],
       "../src/lib/helpers/utils.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
+        "../node_modules/@ethersproject/abstract-signer/lib/index.d.ts",
+        "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
@@ -2575,7 +2587,8 @@
       "../src/lib/helpers/utils.ts",
       "../src/lib/helpers/varuint-bitcoin.d.ts",
       "../src/tests/Adoption.tests.ts",
-      "../src/tests/ContractFactory-ContractInteraction.tests.ts"
+      "../src/tests/ContractFactory-ContractInteraction.tests.ts",
+      "../src/tests/Utils.tests.ts"
     ]
   },
   "version": "4.2.4"

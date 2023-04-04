@@ -1,6 +1,6 @@
 import { Provider, TransactionRequest, TransactionResponse } from "@ethersproject/abstract-provider";
 import { ExternallyOwnedAccount, Signer, TypedDataDomain, TypedDataField, TypedDataSigner } from "@ethersproject/abstract-signer";
-import { Bytes, BytesLike, SignatureLike } from "@ethersproject/bytes";
+import { Bytes, BytesLike } from "@ethersproject/bytes";
 import { Mnemonic } from "@ethersproject/hdnode";
 import { Deferrable } from "@ethersproject/properties";
 import { SigningKey } from "@ethersproject/signing-key";
@@ -9,8 +9,6 @@ import { Wordlist } from "@ethersproject/wordlists";
 import { InputNonces } from "../QtumWallet";
 import { Transaction } from "bitcoinjs-lib";
 export declare const version = "wallet/5.1.0";
-export declare const messagePrefix = "\u0015Qtum Signed Message:\n";
-export declare function hashMessage(message: Bytes | string): string;
 /**
  * Idempotency in Bitcoin forks requires spending the same Bitcoin inputs
  * As long as one of the inputs has already been spent, then the request will fail
@@ -68,7 +66,3 @@ export declare class IntermediateWallet extends Signer implements ExternallyOwne
     static fromEncryptedJsonSync(json: string, password: Bytes | string): IntermediateWallet;
     static fromMnemonic(mnemonic: string, path?: string, wordlist?: Wordlist): IntermediateWallet;
 }
-export declare function verifyMessage(message: Bytes | string, signature: SignatureLike): string;
-export declare function verifyHash(message: Bytes | string, signature: SignatureLike): string;
-export declare function recoverAddress(digest: BytesLike, signature: SignatureLike): string;
-export declare function verifyTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string;

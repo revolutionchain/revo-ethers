@@ -96,6 +96,26 @@ await signer.sendTransaction({
 });
 ```
 
+# Signing/recovering messages
+
+QTUM uses compressed public keys to generate addresses so you need to use our modified `recoverAddress` instead of `ethers.utils.recoverAddress`.
+
+Hash message also uses a different message prefix than Ethereum, it uses `\15QTUM Signed Message:\n`
+
+```js
+import {
+    computeAddress,
+    hashMessage,
+    messagePrefix,
+    recoverAddress
+} from "qtum-ethers-wrapper";
+
+const message = "1234";
+const digest = hashMessage(message);
+const signedMessage = await signer.signMessage(message);
+const recovered = recoverAddress(digest, signedMessage);
+```
+
 # Idempotency
 
 Idempotency in Bitcoin forks involves tying logic to specific UTXO inputs or re-sending the raw serialized transaction and re-crafting a new transaction if that one fails.

@@ -1,13 +1,16 @@
-import { encode as encodeVaruint, encodingLength } from 'varuint-bitcoin';
+import { getAddress } from "@ethersproject/address";
 import { HDNode } from "@ethersproject/hdnode";
 import { defineReadOnly } from "@ethersproject/properties";
 import { encode } from 'bip66';
-import { OPS } from "./opcodes";
-import { GLOBAL_VARS } from "./global-vars";
+import { encode as encodeVaruint, encodingLength } from 'varuint-bitcoin';
 import { BufferCursor } from './buffer-cursor';
-import { getAddress } from "@ethersproject/address";
+import { GLOBAL_VARS } from "./global-vars";
+import { OPS } from "./opcodes";
 
 //@ts-ignore
+import { BigNumber } from "bignumber.js";
+import { decode as decodeCInt, encode as encodeCInt } from "bitcoinjs-lib/src/script_number";
+import { ripemd160, sha256 } from "hash.js";
 import { ecdsaSign, sign } from 'secp256k1';
 let secp256k1Sign = ecdsaSign
 if (!ecdsaSign && sign) {
@@ -22,27 +25,30 @@ if (!ecdsaSign && sign) {
         return sign(buffer, privateKey);
     }
 }
-import { encode as encodeCInt, decode as decodeCInt } from "bitcoinjs-lib/src/script_number"
-import { sha256, ripemd160 } from "hash.js"
-import { BigNumber } from "bignumber.js"
 // 1 satoshi is e-8 so we need bignumber to not set an exponent for numbers greater than that
 // since we use exponents to do multiplication
 // BigNumber.config({ EXPONENTIAL_AT: 10 })
+import { TransactionRequest } from "@ethersproject/abstract-provider";
+import { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer";
+import { concat, SignatureLike } from "@ethersproject/bytes";
+import { _TypedDataEncoder } from "@ethersproject/hash";
+import { keccak256 } from "@ethersproject/keccak256";
+import { computePublicKey, recoverPublicKey } from "@ethersproject/signing-key";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { Transaction } from "@ethersproject/transactions";
+import { Transaction as BitcoinjsTransaction, TxInput } from "bitcoinjs-lib";
+import { BigNumber as BigNumberEthers, BigNumberish } from "ethers";
 import {
     arrayify,
+    Bytes,
     BytesLike,
     hexlify
 } from "ethers/lib/utils";
-import { Transaction } from "@ethersproject/transactions";
-import { BigNumber as BigNumberEthers, BigNumberish } from "ethers";
 import { decode } from "./hex-decoder";
-import { computePublicKey } from "@ethersproject/signing-key";
-import { TransactionRequest } from "@ethersproject/abstract-provider";
 import { QtumTransactionRequest } from './IntermediateWallet';
 
 // const toBuffer = require('typedarray-to-buffer')
 const bitcoinjs = require("bitcoinjs-lib");
-import { Transaction as BitcoinjsTransaction, TxInput } from "bitcoinjs-lib";
 
 // metamask BigNumber uses a different version so the API doesn't match up
 [
@@ -1038,6 +1044,11 @@ function filterInputs(utxos: Array<any>, satoshiPerByte: BigNumberish, utxosToUs
     });
 }
 
+/**
+ * Reverses UTXO hash to get the transaction id for a UTXO
+ * @param hash UTXO hash
+ * @returns transaction id
+ */
 export function getTxIdFromHash(hash: string): string {
     if (hash.startsWith('0x')) {
         hash = hash.substring(2);
@@ -1058,4 +1069,31 @@ export function reverseBuffer(buffer: Buffer) {
         j--;
     }
     return buffer;
+}
+
+export const messagePrefix = "\x15Qtum Signed Message:\n";
+
+export function hashMessage(message: Bytes | string): string {
+    if (typeof(message) === "string") { message = toUtf8Bytes(message); }
+    return keccak256(concat([
+        toUtf8Bytes(messagePrefix),
+        toUtf8Bytes(String(message.length)),
+        message
+    ]));
+}
+
+export function verifyMessage(message: Bytes | string, signature: SignatureLike): string {
+    return recoverAddress(hashMessage(message), signature);
+}
+
+export function verifyHash(message: Bytes | string, signature: SignatureLike): string {
+    return recoverAddress(message, signature);
+}
+
+export function recoverAddress(digest: BytesLike, signature: SignatureLike): string {
+    return computeAddress(recoverPublicKey(arrayify(digest), signature), true);
+}
+
+export function verifyTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string {
+    return recoverAddress(_TypedDataEncoder.hash(domain, types, value), signature);
 }

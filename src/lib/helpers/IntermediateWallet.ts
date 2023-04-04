@@ -2,14 +2,14 @@
 import { getAddress } from "@ethersproject/address";
 import { Provider, TransactionRequest, TransactionResponse } from "@ethersproject/abstract-provider";
 import { ExternallyOwnedAccount, Signer, TypedDataDomain, TypedDataField, TypedDataSigner } from "@ethersproject/abstract-signer";
-import { arrayify, Bytes, BytesLike, concat, hexDataSlice, isHexString, joinSignature, SignatureLike } from "@ethersproject/bytes";
+import { arrayify, Bytes, BytesLike, concat, hexDataSlice, isHexString, joinSignature, SignatureLike, splitSignature } from "@ethersproject/bytes";
 import { _TypedDataEncoder } from "@ethersproject/hash";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { defaultPath, HDNode, entropyToMnemonic, Mnemonic } from "@ethersproject/hdnode";
 import { keccak256 } from "@ethersproject/keccak256";
 import { Deferrable, defineReadOnly, resolveProperties, shallowCopy } from "@ethersproject/properties";
 import { randomBytes } from "@ethersproject/random";
-import { SigningKey } from "@ethersproject/signing-key";
+import { recoverPublicKey, SigningKey } from "@ethersproject/signing-key";
 import { decryptJsonWallet, decryptJsonWalletSync, encryptKeystore, ProgressCallback } from "@ethersproject/json-wallets";
 import {
     serialize,
@@ -18,7 +18,7 @@ import {
     computeAddress as computeEthereumAddress,
 } from "@ethersproject/transactions";
 import { Wordlist } from "@ethersproject/wordlists";
-import { computeAddress, computeAddressFromPublicKey} from "./utils"
+import { computeAddress, computeAddressFromPublicKey, hashMessage } from "./utils"
 import { Logger } from "@ethersproject/logger";
 import secp256k1 from "secp256k1";
 import wif from 'wif';
@@ -33,17 +33,6 @@ const allowedTransactionKeys: Array<string> = [
 ];
 
 type Constructor<T> = { new (): T }
-
-export const messagePrefix = "\x15Qtum Signed Message:\n";
-
-export function hashMessage(message: Bytes | string): string {
-    if (typeof(message) === "string") { message = toUtf8Bytes(message); }
-    return keccak256(concat([
-        toUtf8Bytes(messagePrefix),
-        toUtf8Bytes(String(message.length)),
-        message
-    ]));
-}
 
 function encodeSignatureRSV(signature, recovery, compressed, segwitType) {
     /*
@@ -346,20 +335,4 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
         if (!path) { path = defaultPath; }
         return new IntermediateWallet(HDNode.fromMnemonic(mnemonic, null, wordlist).derivePath(path));
     }
-}
-
-export function verifyMessage(message: Bytes | string, signature: SignatureLike): string {
-    return recoverAddress(hashMessage(message), signature);
-}
-
-export function verifyHash(message: Bytes | string, signature: SignatureLike): string {
-    return recoverAddress(message, signature);
-}
-
-export function recoverAddress(digest: BytesLike, signature: SignatureLike): string {
-    return computeAddress(recoverPublicKey(arrayify(digest), signature));
-}
-
-export function verifyTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string {
-    return recoverAddress(_TypedDataEncoder.hash(domain, types, value), signature);
 }

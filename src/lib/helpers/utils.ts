@@ -11,6 +11,7 @@ import { OPS } from "./opcodes";
 import { BigNumber } from "bignumber.js";
 import { decode as decodeCInt, encode as encodeCInt } from "bitcoinjs-lib/src/script_number";
 import { ripemd160, sha256 } from "hash.js";
+//@ts-ignore
 import { ecdsaSign, sign } from 'secp256k1';
 let secp256k1Sign = ecdsaSign
 if (!ecdsaSign && sign) {

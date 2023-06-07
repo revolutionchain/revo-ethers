@@ -6,6 +6,8 @@ import { encode as encodeVaruint, encodingLength } from 'varuint-bitcoin';
 import { BufferCursor } from './buffer-cursor';
 import { GLOBAL_VARS } from "./global-vars";
 import { OPS } from "./opcodes";
+import { ECSignature } from "bitcoinjs322";
+const bigi = require("bigi");
 
 //@ts-ignore
 import { BigNumber } from "bignumber.js";
@@ -31,10 +33,10 @@ if (!ecdsaSign && sign) {
 // BigNumber.config({ EXPONENTIAL_AT: 10 })
 import { TransactionRequest } from "@ethersproject/abstract-provider";
 import { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer";
-import { concat, SignatureLike } from "@ethersproject/bytes";
+import { concat, Signature, SignatureLike, isBytesLike } from "@ethersproject/bytes";
 import { _TypedDataEncoder } from "@ethersproject/hash";
 import { keccak256 } from "@ethersproject/keccak256";
-import { computePublicKey, recoverPublicKey } from "@ethersproject/signing-key";
+import { computePublicKey } from "@ethersproject/signing-key";
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { Transaction } from "@ethersproject/transactions";
 import { Transaction as BitcoinjsTransaction, TxInput } from "bitcoinjs-lib";
@@ -47,9 +49,19 @@ import {
 } from "ethers/lib/utils";
 import { decode } from "./hex-decoder";
 import { QtumTransactionRequest } from './IntermediateWallet';
+import { ec as EC } from "elliptic";
 
-// const toBuffer = require('typedarray-to-buffer')
+const toBuffer = require("typedarray-to-buffer");
 const bitcoinjs = require("bitcoinjs-lib");
+
+// @ts-ignore
+let _curve: EC = null
+function getCurve() {
+    if (!_curve) {
+        _curve = new EC("secp256k1");
+    }
+    return _curve;
+}
 
 // metamask BigNumber uses a different version so the API doesn't match up
 [
@@ -1075,7 +1087,13 @@ export function reverseBuffer(buffer: Buffer) {
 export const messagePrefix = "\x15Qtum Signed Message:\n";
 
 export function hashMessage(message: Bytes | string): string {
-    if (typeof(message) === "string") { message = toUtf8Bytes(message); }
+    if (typeof(message) === "string") {
+        if (message.startsWith("0x")) {
+            message = arrayify(message);
+        } else {
+            message = toUtf8Bytes(message);
+        }
+    }
     return keccak256(concat([
         toUtf8Bytes(messagePrefix),
         toUtf8Bytes(String(message.length)),
@@ -1087,14 +1105,196 @@ export function verifyMessage(message: Bytes | string, signature: SignatureLike)
     return recoverAddress(hashMessage(message), signature);
 }
 
+export function verifyMessageBtc(message: Bytes | string, signature: SignatureLike): string {
+    return recoverAddressBtc(hashMessage(message), signature);
+}
+
 export function verifyHash(message: Bytes | string, signature: SignatureLike): string {
     return recoverAddress(message, signature);
 }
 
+export function verifyHashBtc(message: Bytes | string, signature: SignatureLike): string {
+    return recoverAddressBtc(message, signature);
+}
+
+export function recoverPublicKey(digest: BytesLike, signature: SignatureLike, vrs?: boolean): string {
+    const sig = splitSignature(signature, vrs || false);
+    const rs = { r: arrayify(sig.r), s: arrayify(sig.s) };
+    return "0x" + getCurve().recoverPubKey(arrayify(digest), rs, sig.recoveryParam).encode("hex", false);
+}
+
 export function recoverAddress(digest: BytesLike, signature: SignatureLike): string {
-    return computeAddress(recoverPublicKey(arrayify(digest), signature), true);
+    return _recoverAddress(digest, signature, false);
+}
+
+export function recoverAddressBtc(digest: BytesLike, signature: SignatureLike): string {
+    return _recoverAddress(digest, signature, true);
+}
+
+function _recoverAddress(digest: BytesLike, signature: SignatureLike, vrs?: boolean): string {
+    const publicKey = recoverPublicKey(arrayify(digest), signature, vrs);
+    const sig = splitSignature(signature, vrs || false);
+    const compressed = sig.v >= 31;
+    return computeAddress(publicKey, compressed);
 }
 
 export function verifyTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string {
     return recoverAddress(_TypedDataEncoder.hash(domain, types, value), signature);
+}
+
+export function verifyTypedDataBtc(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, signature: SignatureLike): string {
+    return recoverAddressBtc(_TypedDataEncoder.hash(domain, types, value), signature);
+}
+
+/**
+ * Converts a `Buffer` into a `0x`-prefixed hex `String`.
+ * @param buf `Buffer` object to convert
+ */
+ export const bufferToHex = function (buf: Buffer): string {
+    buf = toBuffer(buf)
+    return '0x' + buf.toString('hex')
+}
+
+/**
+ * Converts a {@link Buffer} to a {@link bigint}
+ */
+export function bufferToBigInt(buf: Buffer): typeof bigi {
+    let hex = bufferToHex(buf)
+    if (hex === '0x') {
+        return bigi.fromHex("0");
+    }
+    if (hex.startsWith("0x")) {
+        hex = hex.substring(2);
+    }
+    return bigi.fromHex(hex);
+}
+
+/**
+ * Converts a `Buffer` to a `Number`.
+ * @param buf `Buffer` object to convert
+ * @throws If the input number exceeds 53 bits.
+ */
+export const bufferToInt = function (buf: Buffer): number {
+    const res = Number(bufferToBigInt(buf))
+    if (!Number.isSafeInteger(res)) throw new Error('Number exceeds 53 bits')
+    return res
+}
+
+export function splitSignatureRSV(buf: SignatureLike): Signature {
+    return splitSignature(buf, false);
+}
+
+export function splitSignatureVRS(buf: SignatureLike): Signature {
+    return splitSignature(buf, true);
+}
+
+function splitSignature(signature: SignatureLike, vrs: boolean): Signature {
+    let r: Buffer
+    let s: Buffer
+    let v: typeof bigi
+
+    let rStart, rEnd, sStart, sEnd, vStart, vEnd = 0;
+
+    if (vrs) {
+        vStart = 0;
+        vEnd = 1;
+        rStart = vEnd;
+        rEnd = rStart + 32;
+        sStart = rEnd;
+        sEnd = sStart + 32;
+    } else {
+        rStart = 0;
+        rEnd = rStart + 32;
+        sStart = rEnd;
+        sEnd = sStart + 32;
+        vStart = sEnd;
+        vEnd = vStart + 1;
+    }
+
+    if (isBytesLike(signature)) {
+        const buffer: Buffer = toBuffer(arrayify(signature));
+        if (buffer.length >= 65) {
+            r = buffer.slice(rStart, rEnd)
+            s = buffer.slice(sStart, sEnd)
+            v = bufferToBigInt(buffer.slice(vStart, vEnd))
+        } else if (buffer.length === 64) {
+            if (vrs) {
+              throw new Error("EIP-2098 Compact Signature Representation unsupported when decoding signature in Qtum format (VRS vs RSV)")
+            }
+            // Compact Signature Representation (https://eips.ethereum.org/EIPS/eip-2098)
+            r = buffer.slice(rStart, rEnd)
+            s = buffer.slice(sStart, sEnd)
+            v = bigi.fromHex((bufferToInt(buffer.slice(sStart, sStart+1)) >> 7).toString(16))
+            s[0] &= 0x7f
+        } else {
+            throw new Error('Invalid signature length')
+        }
+    } else {
+        r = toBuffer(arrayify(signature.r));
+        if (signature.s) {
+            s = toBuffer(arrayify(signature.s));
+        } else {
+            throw new Error("signature s required")
+        }
+        if (signature.v) {
+            v = bigi.fromHex(signature.v.toString(16));
+        } else {
+            v = bigi.fromHex("0");
+        }
+    }
+
+    // support both versions of `eth_sign` responses
+    const twentySeven = bigi.fromHex("1b")
+    if (v.compareTo(twentySeven) < 0) {
+      v = v.add(twentySeven)
+    }
+
+    // Compute recoveryParam from v
+    const recoveryParam = 1 - (v % 2);
+
+    return {
+      v: parseInt(v.toString(10)),
+      r: hexlify(r),
+      s: hexlify(s),
+      _vs: "0",
+      recoveryParam,
+    }
+}
+
+export type encodeSignatureType = (signature: Uint8Array, recovery: number, compressed: boolean) => Buffer
+
+export function encodeSignatureRSV(signature: Uint8Array, recovery: number, compressed: boolean): Buffer {
+    /*
+    if (segwitType !== undefined) {
+      recovery += 8
+      if (segwitType === SEGWIT_TYPES.P2WPKH) recovery += 4
+    } else {
+        */
+      if (compressed) recovery += 4
+    // }
+    // return Buffer.concat([Buffer.alloc(1, recovery + 27), signature])
+    return Buffer.concat([signature, Buffer.alloc(1, recovery < 27 ? recovery + 27:recovery)])
+}
+
+// https://blog.qtum.org/qip-6-87e7a9743e14
+export function encodeCompactVRS(signature: Uint8Array, recovery?: number, compressed?: boolean): Buffer {
+    let ecsignature;
+    if (signature.length === 65) {
+        let compact = ECSignature.parseCompact(Buffer.from(signature));
+        ecsignature = compact.signature;
+        recovery = compact.i;
+        compressed = compact.compressed;
+    } else if (signature.length === 64) {
+        if (recovery === undefined) {
+            throw new Error("Recovery bit required for 64 byte signature, 0 or 1")
+        }
+        const buffer = Buffer.from(signature);
+        var r = bigi.fromBuffer(buffer.slice(0, 32))
+        var s = bigi.fromBuffer(buffer.slice(32, 64))
+        ecsignature = new ECSignature(r, s);
+    } else {
+        throw new Error("Unknown signature type");
+    }
+
+    return ecsignature.toCompact(recovery || 0, compressed === undefined ? true : compressed);
 }

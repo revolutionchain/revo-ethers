@@ -18,13 +18,13 @@ import {
     computeAddress as computeEthereumAddress,
 } from "@ethersproject/transactions";
 import { Wordlist } from "@ethersproject/wordlists";
-import { computeAddress, computeAddressFromPublicKey, hashMessage } from "./utils"
+import { computeAddress, computeAddressFromPublicKey, hashMessage, encodeCompactVRS, encodeSignatureRSV, encodeSignatureType } from "./utils"
 import { Logger } from "@ethersproject/logger";
 import secp256k1 from "secp256k1";
 import wif from 'wif';
-import { InputNonces } from "../QtumWallet";
 import { Transaction } from "bitcoinjs-lib";
 import { BigNumberish } from "ethers";
+import { TypedDataUtils } from '@metamask/eth-sig-util';
 export const version = "wallet/5.1.0";
 const logger = new Logger(version);
 
@@ -33,19 +33,6 @@ const allowedTransactionKeys: Array<string> = [
 ];
 
 type Constructor<T> = { new (): T }
-
-function encodeSignatureRSV(signature, recovery, compressed, segwitType) {
-    /*
-    if (segwitType !== undefined) {
-      recovery += 8
-      if (segwitType === SEGWIT_TYPES.P2WPKH) recovery += 4
-    } else {
-        */
-      if (compressed) recovery += 4
-    // }
-    // return Buffer.concat([Buffer.alloc(1, recovery + 27), signature])
-    return Buffer.concat([signature, Buffer.alloc(1, recovery + 27)])
-}
 
 function isAccount(value: any): value is ExternallyOwnedAccount {
     return (value != null && isHexString(value.privateKey, 32) && value.address != null);
@@ -98,10 +85,11 @@ export type QtumTransactionRequest = TransactionRequest & {
 }
 
 // Created this class due to address being read only and unwriteable from derived classes.
-export class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
+export abstract class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
 
     readonly address: string;
     readonly provider: Provider;
+    readonly compressed: boolean;
 
     // Wrapping the _signingKey and _mnemonic in a getter function prevents
     // leaking the private key in console.log; still, be careful! :)
@@ -110,6 +98,8 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
 
     constructor(privateKey: BytesLike | ExternallyOwnedAccount | SigningKey, provider?: Provider) {
         super();
+
+        let compressed = true;
 
         if (isAccount(privateKey)) {
             const signingKey = new SigningKey(privateKey.privateKey);
@@ -162,6 +152,7 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
                 try {
                     if (!privateKey.startsWith("0x")) {
                         let decodedKey = wif.decode(privateKey);
+                        compressed = decodedKey.compressed;
                         privateKey = '0x' + decodedKey.privateKey.toString("hex");
                     }
                 } catch (e) {
@@ -173,7 +164,8 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
             }
 
             defineReadOnly(this, "_mnemonic", (): Mnemonic => null);
-            defineReadOnly(this, "address", computeAddressFromPublicKey(this.compressedPublicKey));
+            defineReadOnly(this, "address", computeAddressFromPublicKey(compressed ? this.compressedPublicKey : this.publicKey));
+            this.compressed = compressed;
         }
 
         /* istanbul ignore if */
@@ -238,22 +230,49 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
         });
     }
 
-    async signMessage(message: Bytes | string): Promise<string> {
+    signMessage(message: Bytes | string): Promise<string> {
         const digest = hashMessage(message);
-        return await this.signHash(arrayify(digest));
+        return this.signHash(arrayify(digest));
     }
 
-    async signHash(message: Bytes | string): Promise<string> {
-        if (typeof(message) === "string") { message = toUtf8Bytes(message); }
+    signMessageBtc(message: Bytes | string): Promise<string> {
+        const digest = hashMessage(message);
+        return this.signHashBtc(arrayify(digest));
+    }
+
+    signHash(message: Bytes | string): Promise<string> {
+        return this._signHash(message, encodeSignatureRSV);
+    }
+
+    signHashBtc(message: Bytes | string): Promise<string> {
+        return this._signHash(message, encodeCompactVRS);
+    }
+
+    private async _signHash(message: Bytes | string, encoder: encodeSignatureType): Promise<string> {
+        if (typeof(message) === "string") {
+            if (message.startsWith("0x")) {
+                message = arrayify(message)
+            } else {
+                message = toUtf8Bytes(message);
+            }
+        }
         const sigObj = secp256k1.ecdsaSign(message, Buffer.from(this.privateKey.slice(2), "hex"));
-        return encodeSignatureRSV(
+        return encoder(
             sigObj.signature,
             sigObj.recid,
-            true,
+            this.compressed,
         );
     }
 
-    async _signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
+    _signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
+        return this._signTypedDataWith(domain, types, value, encodeSignatureRSV);
+    }
+
+    _signTypedDataBtc(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string> {
+        return this._signTypedDataWith(domain, types, value, encodeCompactVRS);
+    }
+
+    private async _signTypedDataWith(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>, encoder: encodeSignatureType): Promise<string> {
         // Populate any ENS names
         const populated = await _TypedDataEncoder.resolveNames(domain, types, value, (name: string) => {
             if (this.provider == null) {
@@ -265,7 +284,7 @@ export class IntermediateWallet extends Signer implements ExternallyOwnedAccount
             return this.provider.resolveName(name);
         });
 
-        return await this.signHash(_TypedDataEncoder.hash(populated.domain, types, populated.value));
+        return await this._signHash(_TypedDataEncoder.hash(populated.domain, types, populated.value), encoder);
     }
 
     abstract getIdempotentNonce(signedTransaction: string): InputNonces;

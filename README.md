@@ -1,6 +1,59 @@
 # Qtum Ethers
 A module for using Qtum through an Ethers compliant library to make it simpler to use Qtum
 
+# TLDR for Ethereum developers
+
+```js
+import {Contract} from "ethers"
+import {
+    // import QtumProvider as Provider, replacement for ethers Provider
+    QtumProvider as Provider,
+    // import QtumWallet as Wallet, replacement for ethers Wallet
+    QtumWallet as Wallet,
+    // import QtumContractFactory as ContractFactory, replacement for ethers ContractFactory
+    QtumContractFactory as ContractFactory,
+    // Qtum has two bip44 derivation paths, wallets use different ones
+    // this is optional, the default is SLIP_BIP44_PATH
+    QTUM_BIP44_PATH, // Compatible with Qtum core wallet and electrum
+    SLIP_BIP44_PATH,  // Compatible with 3rd party wallets
+    // Qtum uses compressed public/private keys and you need to consider them when doing cryptography
+    // these functions are replacements for ethers' ones
+    // they have an extra optional parameter to determine whether to use compressed or uncompressed keys (see below)
+    computeAddress,
+    recoverAddress,
+    // Qtum uses a different hash prefix for messages, use these ethers replacement functions
+    hashMessage,
+    messagePrefix
+} from "qtum-ethers-wrapper";
+// Qtum does not support nonces since it is a fork of Bitcoin
+// there is an equivalent workaround feature built into this library
+// it hashes the Bitcoin UTXO inputs and creates a 'nonce'
+// you can get this nonce and use it to force usage of specific Bitcoin UTXO inputs
+// (see documentation further below if idempotency is required)
+const signer = new Wallet(
+    privkey,
+    provider,
+    {
+        // optional, will default to true in a future release
+        filterDust: true,
+        // optional, disable remembering which UTXOs we consume
+        // so that we can avoid trying to spend them again while
+        // new transactions are in the mempool trying to spend them.
+        // having this enabled lets the library send multiple
+        // transactions per block.
+        disableConsumingUtxos: true,
+        // optional, specify inputs to ignore when creating transactions
+        // this list can be created from a serialized hex transaction via
+        // QtumWallet#getIdempotentNonce.inputs
+        ignoreInputs: [''],
+        // list of inputs to force, throws if unable to use them (eg they are already spent)
+        inputs: [''],
+        // hash of inputs, throws if a transaction does not re-use the exact same inputs
+        nonce: '',
+    }
+)
+```
+
 # Installation
 
 Open a console and run 
@@ -100,20 +153,32 @@ await signer.sendTransaction({
 
 QTUM uses compressed public keys to generate addresses so you need to use our modified `recoverAddress` instead of `ethers.utils.recoverAddress`.
 
+Uncompressed keys are supported as well, it uses the recovery parameter to identify if an uncompressed key was used.
+
 Hash message also uses a different message prefix than Ethereum, it uses `\15QTUM Signed Message:\n`
+
+# VRS Signature format
+
+Ethereum serializes signautres as RSV while Bitcoin/Qtum uses VRS, this library supports both formats. The signatures are identical except for how they are serialized, they reference the same points on the elliptic curve.
 
 ```js
 import {
     computeAddress,
     hashMessage,
     messagePrefix,
-    recoverAddress
+    recoverAddress,
+    recoverAddressBtc,
 } from "qtum-ethers-wrapper";
 
 const message = "1234";
 const digest = hashMessage(message);
-const signedMessage = await signer.signMessage(message);
-const recovered = recoverAddress(digest, signedMessage);
+const signedMessageRSV = await signer.signMessage(message);
+const signedMessageVRS = await signer.signMessageBtc(message);
+const recoveredRSV = recoverAddress(digest, signedMessageRSV);
+const recoveredVRS = recoverAddressBtc(digest, signedMessageVRS);
+if (recoveredRSV !== recoveredVRS) {
+    throw new Error("Expected identical addresses");
+}
 ```
 
 # Idempotency

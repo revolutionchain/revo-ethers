@@ -1,17 +1,23 @@
 {
   "dependencies": {
+    "@metamask/eth-sig-util": "^5.1.0",
+    "@types/bigi": "^1.4.3",
     "@types/bitcoinjs-lib": "^5.0.0",
+    "@types/bitcoinjs322": "npm:@types/bitcoinjs-lib@^3.2.2",
     "@types/bn.js": "^5.1.0",
+    "@types/elliptic": "^6.4.14",
     "@types/node": "^14.14.0",
     "@types/secp256k1": "^4.0.2",
+    "bigi": "^1.4.2",
     "bignumber.js": "^9.0.1",
     "bip66": "^1.1.5",
+    "bitcoinjs322": "npm:bitcoinjs-lib@^3.2.2",
     "bn.js": "^5.2.0",
     "buffer": "^5.1.0",
     "buffer-reverse": "^1.0.1",
     "chai": "^4.3.4",
     "crypto": "^1.0.1",
-    "elliptic": "6.5.4",
+    "elliptic": "^6.5.4",
     "ethers": "^5.0.23",
     "hash.js": "^1.1.7",
     "pushdata-bitcoin": "^1.0.1",
@@ -29,8 +35,8 @@
   "license": "",
   "homepage": "https://github.com/qtumproject/qtum-ethers",
   "repository": {
-      "type": "git",
-      "url": "git@github.com:qtumproject/qtum-ethers"
+    "type": "git",
+    "url": "git@github.com:qtumproject/qtum-ethers"
   },
   "keywords": [
     "Ethereum",

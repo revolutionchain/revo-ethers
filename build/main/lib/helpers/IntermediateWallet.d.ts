@@ -6,7 +6,6 @@ import { Deferrable } from "@ethersproject/properties";
 import { SigningKey } from "@ethersproject/signing-key";
 import { ProgressCallback } from "@ethersproject/json-wallets";
 import { Wordlist } from "@ethersproject/wordlists";
-import { InputNonces } from "../QtumWallet";
 import { Transaction } from "bitcoinjs-lib";
 export declare const version = "wallet/5.1.0";
 /**
@@ -38,9 +37,10 @@ export interface Idempotent {
 export declare type QtumTransactionRequest = TransactionRequest & {
     inputs?: Array<string>;
 };
-export declare class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
+export declare abstract class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
     readonly address: string;
     readonly provider: Provider;
+    readonly compressed: boolean;
     readonly _signingKey: () => SigningKey;
     readonly _mnemonic: () => Mnemonic;
     constructor(privateKey: BytesLike | ExternallyOwnedAccount | SigningKey, provider?: Provider);
@@ -53,8 +53,13 @@ export declare class IntermediateWallet extends Signer implements ExternallyOwne
     checkTransaction(transaction: Deferrable<TransactionRequest>): Deferrable<TransactionRequest>;
     signTransaction(transaction: QtumTransactionRequest): Promise<string>;
     signMessage(message: Bytes | string): Promise<string>;
+    signMessageBtc(message: Bytes | string): Promise<string>;
     signHash(message: Bytes | string): Promise<string>;
+    signHashBtc(message: Bytes | string): Promise<string>;
+    private _signHash;
     _signTypedData(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string>;
+    _signTypedDataBtc(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string>;
+    private _signTypedDataWith;
     abstract getIdempotentNonce(signedTransaction: string): InputNonces;
     sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest>;
     encrypt(password: Bytes | string, options?: any, progressCallback?: ProgressCallback): Promise<string>;

@@ -30,7 +30,7 @@
     "wif": "^2.0.6"
   },
   "name": "qtum-ethers-wrapper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "./build/main/index.js",
   "license": "",
   "homepage": "https://github.com/qtumproject/qtum-ethers",

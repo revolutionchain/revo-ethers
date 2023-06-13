@@ -6,7 +6,6 @@ import { encode as encodeVaruint, encodingLength } from 'varuint-bitcoin';
 import { BufferCursor } from './buffer-cursor';
 import { GLOBAL_VARS } from "./global-vars";
 import { OPS } from "./opcodes";
-import { ECSignature } from "bitcoinjs322";
 const bigi = require("bigi");
 
 //@ts-ignore
@@ -1276,25 +1275,15 @@ export function encodeSignatureRSV(signature: Uint8Array, recovery: number, comp
     return Buffer.concat([signature, Buffer.alloc(1, recovery < 27 ? recovery + 27:recovery)])
 }
 
-// https://blog.qtum.org/qip-6-87e7a9743e14
-export function encodeCompactVRS(signature: Uint8Array, recovery?: number, compressed?: boolean): Buffer {
-    let ecsignature;
-    if (signature.length === 65) {
-        let compact = ECSignature.parseCompact(Buffer.from(signature));
-        ecsignature = compact.signature;
-        recovery = compact.i;
-        compressed = compact.compressed;
-    } else if (signature.length === 64) {
-        if (recovery === undefined) {
-            throw new Error("Recovery bit required for 64 byte signature, 0 or 1")
-        }
-        const buffer = Buffer.from(signature);
-        var r = bigi.fromBuffer(buffer.slice(0, 32))
-        var s = bigi.fromBuffer(buffer.slice(32, 64))
-        ecsignature = new ECSignature(r, s);
+export function encodeCompactVRS(signature: Uint8Array, recovery: number, compressed: boolean): Buffer {
+    /*
+    if (segwitType !== undefined) {
+      recovery += 8
+      if (segwitType === SEGWIT_TYPES.P2WPKH) recovery += 4
     } else {
-        throw new Error("Unknown signature type");
-    }
-
-    return ecsignature.toCompact(recovery || 0, compressed === undefined ? true : compressed);
+        */
+      if (compressed) recovery += 4
+    // }
+    // return Buffer.concat([Buffer.alloc(1, recovery + 27), signature])
+    return Buffer.concat([Buffer.alloc(1, recovery < 27 ? recovery + 27:recovery), signature])
 }

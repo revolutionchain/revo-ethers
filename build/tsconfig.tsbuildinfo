@@ -751,6 +751,11 @@
         "signature": "d6068e4b05f9fd73c11ffead8f51eedb4a6dcee816e845d80b192f60fa0d5ccc",
         "affectsGlobalScope": false
       },
+      "../../node_modules/varuint-bitcoin/index.d.ts": {
+        "version": "0c0d4c550d90c330a3129efed22ba8fda8f6151d4f2b2582edebac7582b5b74b",
+        "signature": "0c0d4c550d90c330a3129efed22ba8fda8f6151d4f2b2582edebac7582b5b74b",
+        "affectsGlobalScope": false
+      },
       "../node_modules/@types/bn.js/index.d.ts": {
         "version": "cdac7e46e615e1fdcca7c3a2aab2fbd19085443048733cf239a090f7a17efa27",
         "signature": "cdac7e46e615e1fdcca7c3a2aab2fbd19085443048733cf239a090f7a17efa27",
@@ -769,16 +774,6 @@
       "../src/lib/helpers/opcodes.ts": {
         "version": "d4ea2ad68d6e388cc6b4dc0bfa01b4f4faaa06d04b7013f491063de0fe048bf8",
         "signature": "b7681f81f080bba11bacb4132a55e0c18c95f4fc321b0392b9c36a1cf02d89ee",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/bigi/index.d.ts": {
-        "version": "28992da028e60b178139689c94c64f4cf6ef0631d92b5079dffb8e5111c92976",
-        "signature": "28992da028e60b178139689c94c64f4cf6ef0631d92b5079dffb8e5111c92976",
-        "affectsGlobalScope": false
-      },
-      "../node_modules/@types/bitcoinjs322/index.d.ts": {
-        "version": "bcf92795891d49acf189326a11061d230be44e41ffa30124ccc2e1009b8f1c65",
-        "signature": "bcf92795891d49acf189326a11061d230be44e41ffa30124ccc2e1009b8f1c65",
         "affectsGlobalScope": false
       },
       "../node_modules/bignumber.js/bignumber.d.ts": {
@@ -1307,8 +1302,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/utils.ts": {
-        "version": "e6320ffccada7d148d1e0341d8670959f28b3d6b395bcd94fed2c2f5beb9dfe1",
-        "signature": "8575a81535d5bef78e20f95f2a4085259d5feddecb5cb31e2a4f20602fe3be29",
+        "version": "82f44d34961acf26ece30a4d280f3b63d00e22fc71deed62117c011f679c0c59",
+        "signature": "57305de3b12a3b33444b4c2ac5b45790ff7a6b713205315b54a7d12a73aefcca",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/ethereum-protocol/node_modules/bignumber.js/bignumber.d.ts": {
@@ -1453,6 +1448,9 @@
       "configFilePath": "../tsconfig.json"
     },
     "referencedMap": {
+      "../../node_modules/varuint-bitcoin/index.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts": [
         "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
         "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/types.d.ts",
@@ -2096,10 +2094,6 @@
       ],
       "../node_modules/@metamask/eth-sig-util/dist/utils.d.ts": [
         "../node_modules/@ethereumjs/util/dist/index.d.ts",
-        "../node_modules/@types/node/index.d.ts"
-      ],
-      "../node_modules/@types/bitcoinjs322/index.d.ts": [
-        "../node_modules/@types/bigi/index.d.ts",
         "../node_modules/@types/node/index.d.ts"
       ],
       "../node_modules/@types/bn.js/index.d.ts": [
@@ -2520,7 +2514,6 @@
         "../node_modules/@ethersproject/signing-key/lib/index.d.ts",
         "../node_modules/@ethersproject/strings/lib/index.d.ts",
         "../node_modules/@ethersproject/transactions/lib/index.d.ts",
-        "../node_modules/@types/bitcoinjs322/index.d.ts",
         "../node_modules/@types/elliptic/index.d.ts",
         "../node_modules/@types/secp256k1/index.d.ts",
         "../node_modules/bignumber.js/bignumber.d.ts",
@@ -2539,6 +2532,9 @@
       ]
     },
     "exportedModulesMap": {
+      "../../node_modules/varuint-bitcoin/index.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts": [
         "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
         "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/types.d.ts",
@@ -3184,10 +3180,6 @@
         "../node_modules/@ethereumjs/util/dist/index.d.ts",
         "../node_modules/@types/node/index.d.ts"
       ],
-      "../node_modules/@types/bitcoinjs322/index.d.ts": [
-        "../node_modules/@types/bigi/index.d.ts",
-        "../node_modules/@types/node/index.d.ts"
-      ],
       "../node_modules/@types/bn.js/index.d.ts": [
         "../node_modules/@types/node/index.d.ts"
       ],
@@ -3565,6 +3557,7 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
+      "../../node_modules/varuint-bitcoin/index.d.ts",
       "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/gindex.d.ts",
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts",
@@ -3710,8 +3703,6 @@
       "../node_modules/@metamask/eth-sig-util/dist/personal-sign.d.ts",
       "../node_modules/@metamask/eth-sig-util/dist/sign-typed-data.d.ts",
       "../node_modules/@metamask/eth-sig-util/dist/utils.d.ts",
-      "../node_modules/@types/bigi/index.d.ts",
-      "../node_modules/@types/bitcoinjs322/index.d.ts",
       "../node_modules/@types/bn.js/index.d.ts",
       "../node_modules/@types/elliptic/index.d.ts",
       "../node_modules/@types/elliptic/node_modules/@types/bn.js/index.d.ts",

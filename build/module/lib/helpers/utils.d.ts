@@ -128,5 +128,5 @@ export declare function splitSignatureRSV(buf: SignatureLike): Signature;
 export declare function splitSignatureVRS(buf: SignatureLike): Signature;
 export declare type encodeSignatureType = (signature: Uint8Array, recovery: number, compressed: boolean) => Buffer;
 export declare function encodeSignatureRSV(signature: Uint8Array, recovery: number, compressed: boolean): Buffer;
-export declare function encodeCompactVRS(signature: Uint8Array, recovery?: number, compressed?: boolean): Buffer;
+export declare function encodeCompactVRS(signature: Uint8Array, recovery: number, compressed: boolean): Buffer;
 export {};

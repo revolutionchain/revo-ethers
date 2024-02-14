@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deployContract = void 0;
-const QtumContractFactory_1 = require("./QtumContractFactory");
+const RevoContractFactory_1 = require("./RevoContractFactory");
 const ContractJSON_1 = require("./ContractJSON");
 // @ts-ignore
 async function deployContract(wallet, factoryOrContractJson, args = [], overrideOptions = {}) {
@@ -23,7 +23,7 @@ async function deployFromJson(wallet, contractJson, args, overrideOptions) {
     if (!ContractJSON_1.hasByteCode(bytecode)) {
         throw new Error('Cannot deploy contract with empty bytecode');
     }
-    const factory = new QtumContractFactory_1.QtumContractFactory(contractJson.abi, bytecode, wallet);
+    const factory = new RevoContractFactory_1.RevoContractFactory(contractJson.abi, bytecode, wallet);
     const contract = await factory.deploy(...args, Object.assign({}, overrideOptions));
     await contract.deployed();
     return contract;

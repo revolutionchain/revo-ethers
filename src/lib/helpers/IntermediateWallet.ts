@@ -63,7 +63,7 @@ export interface IdempotentRequest {
     // if different inputs are used
     inputs: Array<string>,
     // The TransactionRequest with the updated nonce
-    transaction: QtumTransactionRequest,
+    transaction: RevoTransactionRequest,
     signedTransaction: string,
     // Send the transaction after storing the nonce somewhere for later requests
     sendTransaction: () => Promise<TransactionResponse>,
@@ -77,10 +77,10 @@ export interface InputNonces {
 
 export interface Idempotent {
     getIdempotentNonce(signedTransaction: string): InputNonces,
-    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest>,
+    sendTransactionIdempotent(transaction: Deferrable<RevoTransactionRequest>): Promise<IdempotentRequest>,
 }
 
-export type QtumTransactionRequest = TransactionRequest & {
+export type RevoTransactionRequest = TransactionRequest & {
     inputs?: Array<string>;
 }
 
@@ -106,9 +106,9 @@ export abstract class IntermediateWallet extends Signer implements ExternallyOwn
             defineReadOnly(this, "_signingKey", () => signingKey);
             defineReadOnly(this, "address", computeAddress(this.publicKey, true));
 
-            if (getAddress(this.address) !== getAddress(privateKey.qtumAddress || privateKey.address)) {
-                if (getAddress(computeEthereumAddress(this.publicKey)) === getAddress(privateKey.qtumAddress || privateKey.address)) {
-                    logger.throwArgumentError("privateKey/address mismatch: Your address is being generated the ethereum way, please use QTUM address generation scheme", "privateKey", "[REDACTED]");
+            if (getAddress(this.address) !== getAddress(privateKey.revoAddress || privateKey.address)) {
+                if (getAddress(computeEthereumAddress(this.publicKey)) === getAddress(privateKey.revoAddress || privateKey.address)) {
+                    logger.throwArgumentError("privateKey/address mismatch: Your address is being generated the ethereum way, please use REVO address generation scheme", "privateKey", "[REDACTED]");
                 } else {
                     logger.throwArgumentError("privateKey/address mismatch", "privateKey", "[REDACTED]");
                 }
@@ -216,7 +216,7 @@ export abstract class IntermediateWallet extends Signer implements ExternallyOwn
         return tx;
     }
 
-    signTransaction(transaction: QtumTransactionRequest): Promise<string> {
+    signTransaction(transaction: RevoTransactionRequest): Promise<string> {
         return resolveProperties(transaction).then((tx) => {
             if (tx.from != null) {
                 if (getAddress(tx.from) !== this.address) {
@@ -289,7 +289,7 @@ export abstract class IntermediateWallet extends Signer implements ExternallyOwn
 
     abstract getIdempotentNonce(signedTransaction: string): InputNonces;
 
-    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest> {
+    sendTransactionIdempotent(transaction: Deferrable<RevoTransactionRequest>): Promise<IdempotentRequest> {
         this._checkProvider("sendTransaction");
         return this.populateTransaction(transaction).then((tx) => {
             return this.signTransaction(tx).then((signedTx) => {

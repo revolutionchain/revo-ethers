@@ -2,16 +2,16 @@
 // const { keccak256 } = require("ethers/lib/utils");
 // @ts-nocheck
 const { expect } = require("chai");
-const { QtumWallet } = require("../../build/main/lib/QtumWallet");
-const { QtumProvider } = require("../../build/main/lib/QtumProvider");
+const { RevoWallet } = require("../../build/main/lib/RevoWallet");
+const { RevoProvider } = require("../../build/main/lib/RevoProvider");
 const { recoverAddress, recoverAddressBtc, hashMessage, verifyMessage, verifyMessageBtc, verifyTypedData, verifyTypedDataBtc, splitSignatureRSV, splitSignatureVRS, swapSignatureRS, } = require("../../build/main/lib/helpers/utils");
 const { _TypedDataEncoder } = require("@ethersproject/hash");
-const provider = new QtumProvider("http://localhost:23890");
+const provider = new RevoProvider("http://localhost:23890");
 const { arrayify } = require("@ethersproject/bytes");
 const { keccak256 } = require("ethers/lib/utils");
 // hash160PubKey/address -> 0xcdf409a70058bfc54ada1ee3422f1ef28d0d267d
-const compressedSigner = new QtumWallet("L1je6aiLCNwPNeeGwgSBfDcobnokp64HzaUZGBV7dZQB1fmsCSBR", provider);
-const uncompressedSigner = new QtumWallet("5KJm4eP8sAwW6J29LpMpJsEPJJMWaNdfY12RFN4Vsyoj6qfKe64", provider);
+const compressedSigner = new RevoWallet("L1je6aiLCNwPNeeGwgSBfDcobnokp64HzaUZGBV7dZQB1fmsCSBR", provider);
+const uncompressedSigner = new RevoWallet("5KJm4eP8sAwW6J29LpMpJsEPJJMWaNdfY12RFN4Vsyoj6qfKe64", provider);
 describe("Utils", function () {
     // compressed private keys are the default
     // therefore, uncompressed private keys require specifying that the key is uncompressed
@@ -97,7 +97,7 @@ describe("Utils", function () {
                         expect(recovered).to.equal(signers[i].signer.address, "Recovered wrong address");
                     });
                 });
-                describe("VRS - (Qtum Signature Format)", function () {
+                describe("VRS - (Revo Signature Format)", function () {
                     it("splitSignatureVRS", async function () {
                         const signatureBtcWithoutPrefix = (await signers[i].signer.signMessageBtc("test")).toString('hex');
                         const signatureBtc = "0x" + signatureBtcWithoutPrefix;

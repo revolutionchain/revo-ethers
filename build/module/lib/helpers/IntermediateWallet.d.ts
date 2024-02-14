@@ -21,7 +21,7 @@ export declare const version = "wallet/5.1.0";
 export interface IdempotentRequest {
     nonce: string;
     inputs: Array<string>;
-    transaction: QtumTransactionRequest;
+    transaction: RevoTransactionRequest;
     signedTransaction: string;
     sendTransaction: () => Promise<TransactionResponse>;
 }
@@ -32,9 +32,9 @@ export interface InputNonces {
 }
 export interface Idempotent {
     getIdempotentNonce(signedTransaction: string): InputNonces;
-    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest>;
+    sendTransactionIdempotent(transaction: Deferrable<RevoTransactionRequest>): Promise<IdempotentRequest>;
 }
-export declare type QtumTransactionRequest = TransactionRequest & {
+export declare type RevoTransactionRequest = TransactionRequest & {
     inputs?: Array<string>;
 };
 export declare abstract class IntermediateWallet extends Signer implements ExternallyOwnedAccount, TypedDataSigner, Idempotent {
@@ -51,7 +51,7 @@ export declare abstract class IntermediateWallet extends Signer implements Exter
     getAddress(): Promise<string>;
     connect<T extends typeof IntermediateWallet>(provider: Provider): InstanceType<T>;
     checkTransaction(transaction: Deferrable<TransactionRequest>): Deferrable<TransactionRequest>;
-    signTransaction(transaction: QtumTransactionRequest): Promise<string>;
+    signTransaction(transaction: RevoTransactionRequest): Promise<string>;
     signMessage(message: Bytes | string): Promise<string>;
     signMessageBtc(message: Bytes | string): Promise<string>;
     signHash(message: Bytes | string): Promise<string>;
@@ -61,7 +61,7 @@ export declare abstract class IntermediateWallet extends Signer implements Exter
     _signTypedDataBtc(domain: TypedDataDomain, types: Record<string, Array<TypedDataField>>, value: Record<string, any>): Promise<string>;
     private _signTypedDataWith;
     abstract getIdempotentNonce(signedTransaction: string): InputNonces;
-    sendTransactionIdempotent(transaction: Deferrable<QtumTransactionRequest>): Promise<IdempotentRequest>;
+    sendTransactionIdempotent(transaction: Deferrable<RevoTransactionRequest>): Promise<IdempotentRequest>;
     encrypt(password: Bytes | string, options?: any, progressCallback?: ProgressCallback): Promise<string>;
     /**
      *  Static methods to create Wallet instances.

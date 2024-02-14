@@ -7,7 +7,7 @@ import { Signature, SignatureLike } from "@ethersproject/bytes";
 import { Transaction } from "@ethersproject/transactions";
 import { BigNumberish } from "ethers";
 import { Bytes, BytesLike } from "ethers/lib/utils";
-import { QtumTransactionRequest } from './IntermediateWallet';
+import { RevoTransactionRequest } from './IntermediateWallet';
 export interface SerializeOptions {
     filterDust: boolean;
     disableConsumingUtxos: boolean;
@@ -87,10 +87,10 @@ export declare function getMinNonDustValue(input: ListUTXOs, feePerByte: BigNumb
 export declare function parseSignedTransaction(transaction: string): Transaction;
 export declare function computeAddress(key: BytesLike | string, compressed?: boolean): string;
 export declare function computeAddressFromPublicKey(publicKey: string): string;
-export declare function configureQtumAddressGeneration(hdnode: HDNode): HDNode;
+export declare function configureRevoAddressGeneration(hdnode: HDNode): HDNode;
 export declare function checkTransactionType(tx: TransactionRequest): CheckTransactionType;
-export declare function serializeTransaction(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, privateKey: string, publicKey: string, opts?: SerializeOptions): Promise<string>;
-export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: QtumTransactionRequest, transactionType: number, signer: Function, publicKey: string, opts?: SerializeOptions): Promise<string>;
+export declare function serializeTransaction(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: RevoTransactionRequest, transactionType: number, privateKey: string, publicKey: string, opts?: SerializeOptions): Promise<string>;
+export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: Function, neededAmount: string, tx: RevoTransactionRequest, transactionType: number, signer: Function, publicKey: string, opts?: SerializeOptions): Promise<string>;
 /**
  * Reverses UTXO hash to get the transaction id for a UTXO
  * @param hash UTXO hash
@@ -98,7 +98,7 @@ export declare function serializeTransactionWith(utxos: Array<any>, fetchUtxos: 
  */
 export declare function getTxIdFromHash(hash: string): string;
 export declare function reverseBuffer(buffer: Buffer): Buffer;
-export declare const messagePrefix = "\u0015Qtum Signed Message:\n";
+export declare const messagePrefix = "\u0015Revo Signed Message:\n";
 export declare function hashMessage(message: Bytes | string): string;
 export declare function verifyMessage(message: Bytes | string, signature: SignatureLike): string;
 export declare function verifyMessageBtc(message: Bytes | string, signature: SignatureLike): string;

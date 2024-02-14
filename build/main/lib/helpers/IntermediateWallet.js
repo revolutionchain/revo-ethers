@@ -43,9 +43,9 @@ class IntermediateWallet extends abstract_signer_1.Signer {
             const signingKey = new signing_key_1.SigningKey(privateKey.privateKey);
             properties_1.defineReadOnly(this, "_signingKey", () => signingKey);
             properties_1.defineReadOnly(this, "address", utils_1.computeAddress(this.publicKey, true));
-            if (address_1.getAddress(this.address) !== address_1.getAddress(privateKey.qtumAddress || privateKey.address)) {
-                if (address_1.getAddress(transactions_1.computeAddress(this.publicKey)) === address_1.getAddress(privateKey.qtumAddress || privateKey.address)) {
-                    logger.throwArgumentError("privateKey/address mismatch: Your address is being generated the ethereum way, please use QTUM address generation scheme", "privateKey", "[REDACTED]");
+            if (address_1.getAddress(this.address) !== address_1.getAddress(privateKey.revoAddress || privateKey.address)) {
+                if (address_1.getAddress(transactions_1.computeAddress(this.publicKey)) === address_1.getAddress(privateKey.revoAddress || privateKey.address)) {
+                    logger.throwArgumentError("privateKey/address mismatch: Your address is being generated the ethereum way, please use REVO address generation scheme", "privateKey", "[REDACTED]");
                 }
                 else {
                     logger.throwArgumentError("privateKey/address mismatch", "privateKey", "[REDACTED]");

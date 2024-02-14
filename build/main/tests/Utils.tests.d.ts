@@ -1,6 +1,6 @@
 declare const expect: any;
-declare const QtumWallet: any;
-declare const QtumProvider: any;
+declare const RevoWallet: any;
+declare const RevoProvider: any;
 declare const recoverAddress: any, recoverAddressBtc: any, hashMessage: any, verifyMessage: any, verifyMessageBtc: any, verifyTypedData: any, verifyTypedDataBtc: any, splitSignatureRSV: any, splitSignatureVRS: any, swapSignatureRS: any;
 declare const _TypedDataEncoder: any;
 declare const provider: any;

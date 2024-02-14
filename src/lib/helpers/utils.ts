@@ -47,7 +47,7 @@ import {
     hexlify
 } from "ethers/lib/utils";
 import { decode } from "./hex-decoder";
-import { QtumTransactionRequest } from './IntermediateWallet';
+import { RevoTransactionRequest } from './IntermediateWallet';
 import { ec as EC } from "elliptic";
 
 const toBuffer = require("typedarray-to-buffer");
@@ -384,7 +384,7 @@ export async function addVins(
     let vinTypes = [];
     let change;
     let inputsAmount = BigNumberEthers.from(0);
-    const neededAmountBN = BigNumberEthers.from(new BigNumber(qtumToSatoshi(neededAmount)).toString());
+    const neededAmountBN = BigNumberEthers.from(new BigNumber(revoToSatoshi(neededAmount)).toString());
     let vbytes = BigNumberEthers.from(GLOBAL_VARS.TX_OVERHEAD_BASE);
     const spendVSizeLookupMap = {
         p2pk: BigNumberEthers.from(GLOBAL_VARS.TX_INPUT_BASE + GLOBAL_VARS.TX_INPUT_SCRIPTSIG_P2PK).toNumber(),
@@ -604,17 +604,17 @@ function shiftBy(amount: BigNumberish, byPowerOfTen: number): string {
     return byPowerOfTen === 0 ? amountString : `${amountString}e${byPowerOfTen < 0 ? '':'+'}${byPowerOfTen}`;
 }
 
-function satoshiToQtum(inSatoshi?: BigNumberish): string {
+function satoshiToRevo(inSatoshi?: BigNumberish): string {
     return shiftBy(inSatoshi || 0, -8);
 }
 
-function qtumToSatoshi(inQtum?: BigNumberish): string {
-    return shiftBy(inQtum || 0, 8);
+function revoToSatoshi(inRevo?: BigNumberish): string {
+    return shiftBy(inRevo || 0, 8);
 }
 
 function checkLostPrecisionInGasPrice(gasPrice: number) {
-    const roundedGasPrice = new BigNumber(new BigNumber(satoshiToQtum(gasPrice)).toFixed(8)).toNumber();
-    const originalGasPrice = new BigNumber(new BigNumber(satoshiToQtum(gasPrice)).toFixed()).toNumber();
+    const roundedGasPrice = new BigNumber(new BigNumber(satoshiToRevo(gasPrice)).toFixed(8)).toNumber();
+    const originalGasPrice = new BigNumber(new BigNumber(satoshiToRevo(gasPrice)).toFixed()).toNumber();
     if (roundedGasPrice != originalGasPrice) {
         throw new Error("Precision lost in gasPrice: " + (originalGasPrice - roundedGasPrice))
     }
@@ -694,16 +694,16 @@ export function computeAddressFromPublicKey(publicKey: string): string {
     return getAddress(`0x${prefixlessAddress}`);
 }
 
-export function configureQtumAddressGeneration(hdnode: HDNode): HDNode {
-    // QTUM computes address from the public key differently than ethereum, ethereum uses keccak256 while QTUM uses ripemd160(sha256(compressedPublicKey))
+export function configureRevoAddressGeneration(hdnode: HDNode): HDNode {
+    // REVO computes address from the public key differently than ethereum, ethereum uses keccak256 while REVO uses ripemd160(sha256(compressedPublicKey))
     // @ts-ignore
-    defineReadOnly(hdnode, "qtumAddress", computeAddress(hdnode.publicKey, true));
+    defineReadOnly(hdnode, "revoAddress", computeAddress(hdnode.publicKey, true));
     return hdnode;
 }
 
 export function checkTransactionType(tx: TransactionRequest): CheckTransactionType {
     if (!!tx.to === false && (!!tx.value === false || BigNumberEthers.from(tx.value).toNumber() === 0) && !!tx.data === true) {
-        const needed = new BigNumber(satoshiToQtum(tx.gasPrice)).times(BigNumberEthers.from(tx.gasLimit).toNumber()).toFixed(8).toString()
+        const needed = new BigNumber(satoshiToRevo(tx.gasPrice)).times(BigNumberEthers.from(tx.gasLimit).toNumber()).toFixed(8).toString()
         return { transactionType: GLOBAL_VARS.CONTRACT_CREATION, neededAmount: needed }
     }
     else if (!!tx.to === false && BigNumberEthers.from(tx.value).toNumber() > 0 && !!tx.data === true) {
@@ -712,16 +712,16 @@ export function checkTransactionType(tx: TransactionRequest): CheckTransactionTy
     else if (!!tx.to === true && !!tx.data === true) {
         const needed = !!tx.value === true ? 
             new BigNumber(
-                new BigNumber(satoshiToQtum(tx.gasPrice)).toFixed(8))
+                new BigNumber(satoshiToRevo(tx.gasPrice)).toFixed(8))
                     .times(BigNumberEthers.from(tx.gasLimit).toNumber())
-                    .plus(satoshiToQtum(tx.value)).toFixed(8) :
-            new BigNumber(new BigNumber(satoshiToQtum(tx.gasPrice)).toFixed(8))
+                    .plus(satoshiToRevo(tx.value)).toFixed(8) :
+            new BigNumber(new BigNumber(satoshiToRevo(tx.gasPrice)).toFixed(8))
                 .times(BigNumberEthers.from(tx.gasLimit).toNumber()).toFixed(8)
         return { transactionType: GLOBAL_VARS.CONTRACT_CALL, neededAmount: needed }
     }
     else {
-        const gas = new BigNumber(satoshiToQtum(tx.gasPrice)).times(BigNumberEthers.from(tx.gasLimit).toNumber());
-        const needed = new BigNumber(satoshiToQtum(tx.value)).plus(gas).toFixed(8);
+        const gas = new BigNumber(satoshiToRevo(tx.gasPrice)).times(BigNumberEthers.from(tx.gasLimit).toNumber());
+        const needed = new BigNumber(satoshiToRevo(tx.value)).plus(gas).toFixed(8);
         return { transactionType: GLOBAL_VARS.P2PKH, neededAmount: needed }
     }
 }
@@ -730,7 +730,7 @@ export async function serializeTransaction(
     utxos: Array<any>,
     fetchUtxos: Function,
     neededAmount: string,
-    tx: QtumTransactionRequest,
+    tx: RevoTransactionRequest,
     transactionType: number,
     privateKey: string,
     publicKey: string,
@@ -794,14 +794,14 @@ export async function serializeTransactionWith(
     utxos: Array<any>,
     fetchUtxos: Function,
     neededAmount: string,
-    tx: QtumTransactionRequest,
+    tx: RevoTransactionRequest,
     transactionType: number,
     signer: Function,
     publicKey: string,
     opts?: SerializeOptions,
 ): Promise<string> {
-    // Building the QTUM tx that will eventually be serialized.
-    let qtumTx: Tx = { version: 2, locktime: 0, vins: [], vouts: [] };
+    // Building the REVO tx that will eventually be serialized.
+    let revoTx: Tx = { version: 2, locktime: 0, vins: [], vouts: [] };
     // reduce precision in gasPrice to 1 satoshi
     tx.gasPrice = tx.gasPrice;
     // tx.gasPrice = dropPrecisionLessThanOneSatoshi(BigNumberEthers.from(tx.gasPrice).toString());
@@ -829,14 +829,14 @@ export async function serializeTransactionWith(
             // @ts-ignore
             tx.data,
             "",
-            // OP_CREATE cannot send QTUM when deploying contract
+            // OP_CREATE cannot send REVO when deploying contract
             new BigNumber(BigNumberEthers.from("0x0").toNumber() + `e-8`).toFixed(8),
         );
         vouts.push(contractCreateVout);
-        qtumTx.vouts.push(contractCreateVout);
+        revoTx.vouts.push(contractCreateVout);
     } else if (transactionType === GLOBAL_VARS.CONTRACT_CALL) {
         const contractVoutValue = !!tx.value === true ?
-            new BigNumber(satoshiToQtum(tx.value)).toNumber() :
+            new BigNumber(satoshiToRevo(tx.value)).toNumber() :
             new BigNumber(BigNumberEthers.from("0x0").toNumber() + `e-8`).toFixed(8);
         const contractCallVout = getContractVout(
             BigNumberEthers.from(tx.gasPrice).toNumber(),
@@ -847,7 +847,7 @@ export async function serializeTransactionWith(
             contractVoutValue,
         );
         vouts.push(contractCallVout);
-        qtumTx.vouts.push(contractCallVout);
+        revoTx.vouts.push(contractCallVout);
     } else if (transactionType === GLOBAL_VARS.P2PKH) {
         // need to correct neededAmount
         // check if sending all
@@ -865,15 +865,15 @@ export async function serializeTransactionWith(
         needChange = !inputsAmount.eq(neededAmountBN);
         if (needChange) {
             neededAmountBN = neededAmountMinusGasBN;
-            neededAmount = satoshiToQtum(neededAmountBN);
+            neededAmount = satoshiToRevo(neededAmountBN);
         }
         if (!neededAmountBN.eq(BigNumberEthers.from(0))) {
             // no need to generate an empty UTXO and clog the blockchain
             vouts.push('p2pkh')
         }
     } else if (transactionType === GLOBAL_VARS.DEPLOY_ERROR) {
-        // user requested sending QTUM with OP_CREATE which will result in the QTUM being lost
-        throw new Error("Cannot send QTUM to contract when deploying a contract");
+        // user requested sending REVO with OP_CREATE which will result in the REVO being lost
+        throw new Error("Cannot send REVO to contract when deploying a contract");
     } else {
         throw new Error("Internal error: unknown transaction type: " + transactionType);
     }
@@ -906,7 +906,7 @@ export async function serializeTransactionWith(
             tx.inputs || [],
             opts || {} as SerializeOptions,
         );
-        const neededAmountMinusGas = satoshiToQtum(neededAmountMinusGasBN);
+        const neededAmountMinusGas = satoshiToRevo(neededAmountMinusGasBN);
         // @ts-ignore
         [vins, amounts, availableAmount, fee, changeAmount, changeType, vinTypes] = await addVins(
             vouts,
@@ -923,7 +923,7 @@ export async function serializeTransactionWith(
         throw new Error("Couldn't find any vins");
     }
 
-    qtumTx.vins = vins;
+    revoTx.vins = vins;
 
     if (opts?.disableConsumingUtxos) {
         vins.forEach(consumeUtxos);
@@ -945,13 +945,13 @@ export async function serializeTransactionWith(
                 script: p2pkhScript(Buffer.from(hash160Address, "hex")),
                 value: value
             };
-            qtumTx.vouts.push(p2pkhVout);
+            revoTx.vouts.push(p2pkhVout);
         }
     }
 
     // add change if needed
     if (changeAmount) {
-        qtumTx.vouts.push({
+        revoTx.vouts.push({
             // @ts-ignore
             script: scriptMap[changeType](Buffer.from(hash160PubKey, "hex")),
             value: changeAmount.toNumber()
@@ -960,16 +960,16 @@ export async function serializeTransactionWith(
 
     // Sign necessary vins
     const updatedVins = [];
-    for (let i = 0; i < qtumTx.vins.length; i++) {
+    for (let i = 0; i < revoTx.vins.length; i++) {
         if (vinTypes[i].toLowerCase() === "p2pk")  {
-            updatedVins.push({ ...qtumTx.vins[i], ['scriptSig']: p2pkScriptSig(await signp2pkhWith(qtumTx, i, signer)) })
+            updatedVins.push({ ...revoTx.vins[i], ['scriptSig']: p2pkScriptSig(await signp2pkhWith(revoTx, i, signer)) })
         } else {
-            updatedVins.push({ ...qtumTx.vins[i], ['scriptSig']: p2pkhScriptSig(await signp2pkhWith(qtumTx, i, signer), publicKey.split("0x")[1]) })
+            updatedVins.push({ ...revoTx.vins[i], ['scriptSig']: p2pkhScriptSig(await signp2pkhWith(revoTx, i, signer), publicKey.split("0x")[1]) })
         }
     }
-    qtumTx.vins = updatedVins
+    revoTx.vins = updatedVins
     // Build the serialized transaction string.
-    return txToBuffer(qtumTx).toString('hex');
+    return txToBuffer(revoTx).toString('hex');
 }
 
 // Iterate over list of inputs and if the input is a serialized transaction, decode it and add its inputs
@@ -1083,7 +1083,7 @@ export function reverseBuffer(buffer: Buffer) {
     return buffer;
 }
 
-export const messagePrefix = "\x15Qtum Signed Message:\n";
+export const messagePrefix = "\x15Revo Signed Message:\n";
 
 export function hashMessage(message: Bytes | string): string {
     if (typeof(message) === "string") {
@@ -1218,7 +1218,7 @@ function splitSignature(signature: SignatureLike, vrs: boolean): Signature {
             v = bufferToBigInt(buffer.slice(vStart, vEnd))
         } else if (buffer.length === 64) {
             if (vrs) {
-              throw new Error("EIP-2098 Compact Signature Representation unsupported when decoding signature in Qtum format (VRS vs RSV)")
+              throw new Error("EIP-2098 Compact Signature Representation unsupported when decoding signature in Revo format (VRS vs RSV)")
             }
             // Compact Signature Representation (https://eips.ethereum.org/EIPS/eip-2098)
             r = buffer.slice(rStart, rEnd)

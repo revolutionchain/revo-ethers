@@ -27,19 +27,19 @@
     "varuint-bitcoin": "1.1.0",
     "wif": "^2.0.6"
   },
-  "name": "qtum-ethers-wrapper",
+  "name": "revo-ethers-wrapper",
   "version": "2.1.2",
   "main": "./build/main/index.js",
   "license": "",
-  "homepage": "https://github.com/qtumproject/qtum-ethers",
+  "homepage": "https://github.com/revolutionchain/revo-ethers",
   "repository": {
     "type": "git",
-    "url": "git@github.com:qtumproject/qtum-ethers"
+    "url": "git@github.com:revolutionchain/revo-ethers"
   },
   "keywords": [
     "Ethereum",
     "ethers",
-    "QTUM"
+    "REVO"
   ],
   "scripts": {
     "build": "yarn build:main && yarn build:module",

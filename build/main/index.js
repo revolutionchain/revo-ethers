@@ -10,13 +10,13 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./lib/QtumProvider"), exports);
-__exportStar(require("./lib/QtumFunctionProvider"), exports);
-__exportStar(require("./lib/QtumTestProvider"), exports);
-__exportStar(require("./lib/QtumContractFactory"), exports);
-__exportStar(require("./lib/QtumWallet"), exports);
-__exportStar(require("./lib/QtumTransaction"), exports);
-__exportStar(require("./lib/QtumHDKey"), exports);
+__exportStar(require("./lib/RevoProvider"), exports);
+__exportStar(require("./lib/RevoFunctionProvider"), exports);
+__exportStar(require("./lib/RevoTestProvider"), exports);
+__exportStar(require("./lib/RevoContractFactory"), exports);
+__exportStar(require("./lib/RevoWallet"), exports);
+__exportStar(require("./lib/RevoTransaction"), exports);
+__exportStar(require("./lib/RevoHDKey"), exports);
 __exportStar(require("./lib/deployContract"), exports);
 __exportStar(require("./lib/helpers/utils"), exports);
 //# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBQUEscURBQW1DO0FBQ25DLDZEQUEyQztBQUMzQyx5REFBdUM7QUFDdkMsNERBQTBDO0FBQzFDLG1EQUFpQztBQUNqQyx3REFBc0M7QUFDdEMsa0RBQWdDO0FBQ2hDLHVEQUFxQztBQUNyQyxzREFBb0MifQ==

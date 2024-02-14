@@ -3,15 +3,15 @@
 const { BigNumber } = require("@ethersproject/bignumber");
 const { expect } = require("chai");
 const { ethers } = require("ethers");
-const { QtumWallet } = require("../../build/main/lib/QtumWallet");
-const { QtumProvider } = require("../../build/main/lib/QtumProvider");
-const { QtumContractFactory, } = require("../../build/main/lib/QtumContractFactory");
+const { RevoWallet } = require("../../build/main/lib/RevoWallet");
+const { RevoProvider } = require("../../build/main/lib/RevoProvider");
+const { RevoContractFactory, } = require("../../build/main/lib/RevoContractFactory");
 const { generateContractAddress } = require('../../build/main/lib/helpers/utils');
-const provider = new QtumProvider("http://localhost:23890");
+const provider = new RevoProvider("http://localhost:23890");
 // hash160PubKey/address -> 0xcdf409a70058bfc54ada1ee3422f1ef28d0d267d
-const signer = new QtumWallet("99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e", provider);
+const signer = new RevoWallet("99dda7e1a59655c9e02de8592be3b914df7df320e72ce04ccf0427f9a366ec6e", provider);
 // hash160PubKey/address -> 0x30a41759e2fec594fbb90ea2b212c9ef8074e227
-const signerNoQtum = new QtumWallet("61fd08e21110d908cf8dc20bb243a96e2dc0d29169b4fec09594c39e4384125a", provider);
+const signerNoRevo = new RevoWallet("61fd08e21110d908cf8dc20bb243a96e2dc0d29169b4fec09594c39e4384125a", provider);
 const ADOPTION_ABI = [
     {
         "inputs": [
@@ -71,7 +71,7 @@ const ADOPTION_BYTECODE = "0x608060405234801561001057600080fd5b5061021c806100206
 describe("Adoption", function () {
     context("ethers.Contract", function () {
         it("can deploy and adopt", async function () {
-            const adoption = new QtumContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
+            const adoption = new RevoContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
             const deployment = await adoption.deploy({
                 gasPrice: "0x190"
             });
@@ -88,9 +88,9 @@ describe("Adoption", function () {
             expect(adopters[0]).to.equal("0xCDF409A70058BFC54AdA1eE3422f1EF28d0d267D");
         });
     });
-    context("QtumContractFactory", function () {
+    context("RevoContractFactory", function () {
         it("can deploy and adopt", async function () {
-            const adoption = new QtumContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
+            const adoption = new RevoContractFactory(ADOPTION_ABI, ADOPTION_BYTECODE, signer);
             const deployment = await adoption.deploy({
                 gasPrice: "0x190"
             });

@@ -1,4 +1,4 @@
-import { QtumContractFactory as ContractFactory } from './QtumContractFactory';
+import { RevoContractFactory as ContractFactory } from './RevoContractFactory';
 import { isStandard, hasByteCode } from './ContractJSON';
 // @ts-ignore
 export async function deployContract(wallet, factoryOrContractJson, args = [], overrideOptions = {}) {

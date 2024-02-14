@@ -751,11 +751,6 @@
         "signature": "d6068e4b05f9fd73c11ffead8f51eedb4a6dcee816e845d80b192f60fa0d5ccc",
         "affectsGlobalScope": false
       },
-      "../../node_modules/varuint-bitcoin/index.d.ts": {
-        "version": "0c0d4c550d90c330a3129efed22ba8fda8f6151d4f2b2582edebac7582b5b74b",
-        "signature": "0c0d4c550d90c330a3129efed22ba8fda8f6151d4f2b2582edebac7582b5b74b",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/bn.js/index.d.ts": {
         "version": "cdac7e46e615e1fdcca7c3a2aab2fbd19085443048733cf239a090f7a17efa27",
         "signature": "cdac7e46e615e1fdcca7c3a2aab2fbd19085443048733cf239a090f7a17efa27",
@@ -1287,8 +1282,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/IntermediateWallet.ts": {
-        "version": "bff3eddc2a1be94af1eb21e71570cbeb384d82a7aa92e31520766e3a90e48fda",
-        "signature": "abf653508933e1f868f8e7b66d9355867f7b2992e199ec2d0c4b70d91abd3d5c",
+        "version": "648d318a325911947a27720cd66e490d03ad3624506e3d2672d7238d283cb6a2",
+        "signature": "2ec733e582e450afead7a47e3c70c39d2ad6b8dd573d348ca3de0df731d8d393",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/elliptic/node_modules/@types/bn.js/index.d.ts": {
@@ -1302,8 +1297,8 @@
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/utils.ts": {
-        "version": "82f44d34961acf26ece30a4d280f3b63d00e22fc71deed62117c011f679c0c59",
-        "signature": "57305de3b12a3b33444b4c2ac5b45790ff7a6b713205315b54a7d12a73aefcca",
+        "version": "b8d5c0d61780834b9368c1b5b7731c30cab83abe254f7decd331aa9ac174e0a4",
+        "signature": "314808853d7ba9c6cfe202a81fb46f2edee890050b62de9c147b5571324521ee",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/ethereum-protocol/node_modules/bignumber.js/bignumber.d.ts": {
@@ -1316,39 +1311,39 @@
         "signature": "2270685273f57c6ebb35f3097c8abbc4c9d0ab01946c67f6d2952376825ac047",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumProvider.ts": {
-        "version": "4d437419d16646281cd6358ab90f94f6756cbfb241ca96298741f6227ee7cd38",
-        "signature": "cc0441a0735d42549ab315c369ed430057e192e3b17fedd19ba3cf071df9e741",
+      "../src/lib/RevoProvider.ts": {
+        "version": "f8a19ddcc84de14673d4c3f26c137937194a1da6024d142b0001434ee8a5e0b7",
+        "signature": "6ab120daadf5074b56e4bec752e117f75ff4b26668ed1bd503fcd701286b2c46",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumFunctionProvider.ts": {
-        "version": "b5af4c7fd8124201839e3974e4aee456a120ba9bf506e638e731dcb6d6c3b484",
-        "signature": "c5f4f8638f766685b0e52a173e377a3ac6272cadfd4ffd272bb6bc2e40bfc369",
+      "../src/lib/RevoFunctionProvider.ts": {
+        "version": "11740822b03d5afa766b43e2428496f26d96af68c51b493b5f0f12f8755d3dc3",
+        "signature": "3c4b8dcde03fd659012953878a7acec28d2bc485d94f61cb4e23bb3ec1b1e6cb",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumWallet.ts": {
-        "version": "3c77e3ea8b2f35c3dc0818589631add24110d5adaec1834edf1aaaf75d2a09a8",
-        "signature": "901f5dfa6c26e306b3ebf39c4aa4fd7151a3f00f9c97f799101d7466e1f9c238",
+      "../src/lib/RevoWallet.ts": {
+        "version": "6b06dba31b233253d5695a8f8be4edddae223d902bec03d72c25fe7d0c1e84ac",
+        "signature": "7981cf8b0959cf402e092737ee470a706a2cec3ddfb92fc3a5c97242a07a4ef9",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumTestProvider.ts": {
-        "version": "930ff8bc34e0dc29a3254a7d4ff94f6969ef0f86d55adc708b6d7ba0979302fd",
-        "signature": "f9ad38799fec437d52a10ffa3fc6940f68cf2e6062bdf4a6d2201d746829b0f2",
+      "../src/lib/RevoTestProvider.ts": {
+        "version": "3e7d5741a3509d65d00f2465bd3b9b00992b803d92fd365f6ad1293b31de3719",
+        "signature": "d9002f19fa4c88a404d3ab27f92d1af0f42d0654d706f90683332e6f85317da4",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumContractFactory.ts": {
-        "version": "04c87904c4233759c392acd6c1d25d759eb7041f67c6a2f27dcc15392606656d",
-        "signature": "4358c48912773e958a932208edfb5c4128d0c398aa21e04f46a532c610db38a5",
+      "../src/lib/RevoContractFactory.ts": {
+        "version": "e1eb2f79d8dba9a8987ca8bfd61b8d0e120d48908f66b2fd5719046b1eb26014",
+        "signature": "f2993f4664c2e6e96e9abc103c8d4670dac8e8ebffc5988ab3d08bf68668492f",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumTransaction.ts": {
-        "version": "fcc7b181370cff3f4a90c5999d689592bb0c38339d88fb8d867722cc62ebb02f",
-        "signature": "09c251d5ea8d3a5a760712d9d6cbc7db070c9745092478927fd3d6c367572e5b",
+      "../src/lib/RevoTransaction.ts": {
+        "version": "418e6990fb6c0a62ee2d040583ef7e7b5b76c14ab4b8b3964d56d5a5ab4dece6",
+        "signature": "c6d8416e7bb4a35d66bbd8799befcc5cec71418d457eea05530622862aa61d60",
         "affectsGlobalScope": false
       },
-      "../src/lib/QtumHDKey.ts": {
-        "version": "98e73fae48072cd24c3c229350b1913dbbde74a90a263e27c757aab2cb9294d7",
-        "signature": "8488e3a1f4dcc92396d2f6b9bd75c20c2377113d702c8d2514cc635e5646e285",
+      "../src/lib/RevoHDKey.ts": {
+        "version": "65b63ab56f4ac87a6ab5369552ec5cd0f621dc7d056f59818aac2a7659a57b17",
+        "signature": "02ace3a5a7f666ef57cd8f785446ec7dcf2c66052467aa58b2e9d71b2877e73e",
         "affectsGlobalScope": false
       },
       "../src/lib/ContractJSON.ts": {
@@ -1357,13 +1352,13 @@
         "affectsGlobalScope": false
       },
       "../src/lib/deployContract.ts": {
-        "version": "b71350e6811dbaf5cdc4b6a9fa170418f0a244316526df4bcf5e5375e515d714",
+        "version": "9970e0a71fcf1eebe568441b6469d20a6bf9859125c34ae32f399101d8ad1b7b",
         "signature": "2e34e556e41bd43a1a3319ae4061dae39866096e30349fa58971963608bfd1c2",
         "affectsGlobalScope": false
       },
       "../src/index.ts": {
-        "version": "57981a621b92df86114bc469409e9aa252585e31506023d86c6d69c47bf83f0b",
-        "signature": "e291c4c13f5a9fdbf932251c4ed738bb7f959d884e0e0d43c91c2721023b870a",
+        "version": "100eed572be8457e42c03b42229c7bfc6fa6a396154529382cc306bcc887a698",
+        "signature": "b589b85bf28cb87b66422d30f6648df6812712d373145c865ec01f89ba98d93d",
         "affectsGlobalScope": false
       },
       "../src/lib/helpers/bip66.d.ts": {
@@ -1382,28 +1377,28 @@
         "affectsGlobalScope": false
       },
       "../src/tests/Adoption.tests.ts": {
-        "version": "c4211a03b771a0ae71221beccb707459ef04b4039f7119fa1afe468d499d4c86",
-        "signature": "e7ee052b24df860909bf77eabf8208d32420217eda8650ed8225f0def7b54de1",
+        "version": "4c560ca41c703a1666c170d436c15099183ba9eea6a7356c81a5ae549a9708f6",
+        "signature": "21f917a76b3f13f35642de0d6d5519311bf3c5fdc14a175e0bc2ddb0a090f132",
         "affectsGlobalScope": true
       },
       "../src/tests/ContractFactory-ContractInteraction.tests.ts": {
-        "version": "0707dca472061b24d8fdd02617d9a5b5b4f30cceb01b6c84d4e7f08aa0852845",
-        "signature": "9afb35663c49227f946ed86fc40818ce70375ba98e55d5117e303cfa17d1ee24",
+        "version": "7c23bb5fc3ab610a9132ff6cea0c00f20e00e37d793dad50d8c71d9fa1dcba36",
+        "signature": "a0c4c7a2a04f549829ec4e0eebe1f46aa419d2250d7872ac961c65452f859734",
         "affectsGlobalScope": true
       },
-      "../src/tests/QtumProvider.tests.ts": {
-        "version": "7461be9df9e11365f3fd3b7eeefcc4863f584d7be6ffd2abf57a40f5134df2df",
-        "signature": "b59a082c88fe626f8c97de2d50da1fbcba1f4f88751f323c9426007ca0fbbe3a",
+      "../src/tests/RevoProvider.tests.ts": {
+        "version": "cfd6da4e167eab2ab760c1a334c280df5c174c082d1b652bde6d590c17918147",
+        "signature": "5069cb23772d2a0f8a362d5cbfbdc6551de7f68afc6f17ad15cd75d6835790c8",
         "affectsGlobalScope": true
       },
-      "../src/tests/QtumWallet.tests.ts": {
-        "version": "d522f442730c1049481c0c3feedab181944ad4e72d8634a7e493b82b44b874de",
-        "signature": "f357b7374e48dd4ab418881857a76b55155f60adabbadf373408fb0af59bebdf",
+      "../src/tests/RevoWallet.tests.ts": {
+        "version": "e9c480d5d5b239bd7403da42f9e32a123a6a7185fe25ffb7c19dda9827920763",
+        "signature": "1eb232315c45487be4319efbeb847a325fa86f7e103b58969970790c7a2aea84",
         "affectsGlobalScope": true
       },
       "../src/tests/Utils.tests.ts": {
-        "version": "0059fedb42bb08e7b2cde48d5f90f7c6bc91eaaf99c24afc9ab5e13c964dc160",
-        "signature": "ff129fa9191f8f13135915bf3fd1198f9376dc55ed58b55606474574b71c6cd6",
+        "version": "bb4d82d538ad6b943b0c5bf375aa784470a3d119d275ea89cd4b3398dedb5992",
+        "signature": "c5f3ad80fef0f0ad720e013a6f87ae43c18ffed376041d11865a5028dbd6e145",
         "affectsGlobalScope": true
       },
       "../node_modules/@types/mocha/index.d.ts": {
@@ -1448,9 +1443,6 @@
       "configFilePath": "../tsconfig.module.json"
     },
     "referencedMap": {
-      "../../node_modules/varuint-bitcoin/index.d.ts": [
-        "../node_modules/@types/node/index.d.ts"
-      ],
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts": [
         "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
         "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/types.d.ts",
@@ -2410,17 +2402,17 @@
         "../node_modules/@ethersproject/web/lib/index.d.ts"
       ],
       "../src/index.ts": [
-        "../src/lib/QtumContractFactory.ts",
-        "../src/lib/QtumFunctionProvider.ts",
-        "../src/lib/QtumHDKey.ts",
-        "../src/lib/QtumProvider.ts",
-        "../src/lib/QtumTestProvider.ts",
-        "../src/lib/QtumTransaction.ts",
-        "../src/lib/QtumWallet.ts",
+        "../src/lib/RevoContractFactory.ts",
+        "../src/lib/RevoFunctionProvider.ts",
+        "../src/lib/RevoHDKey.ts",
+        "../src/lib/RevoProvider.ts",
+        "../src/lib/RevoTestProvider.ts",
+        "../src/lib/RevoTransaction.ts",
+        "../src/lib/RevoWallet.ts",
         "../src/lib/deployContract.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumContractFactory.ts": [
+      "../src/lib/RevoContractFactory.ts": [
         "../node_modules/@ethersproject/abi/lib/index.d.ts",
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
         "../node_modules/@ethersproject/address/lib/index.d.ts",
@@ -2429,15 +2421,15 @@
         "../node_modules/ethers/lib/utils.d.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumFunctionProvider.ts": [
-        "../src/lib/QtumProvider.ts"
+      "../src/lib/RevoFunctionProvider.ts": [
+        "../src/lib/RevoProvider.ts"
       ],
-      "../src/lib/QtumHDKey.ts": [
+      "../src/lib/RevoHDKey.ts": [
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
-        "../src/lib/QtumWallet.ts",
+        "../src/lib/RevoWallet.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumProvider.ts": [
+      "../src/lib/RevoProvider.ts": [
         "../node_modules/@ethersproject/logger/lib/index.d.ts",
         "../node_modules/@ethersproject/networks/lib/index.d.ts",
         "../node_modules/@ethersproject/properties/lib/index.d.ts",
@@ -2445,19 +2437,19 @@
         "../node_modules/ethers/lib/index.d.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumTestProvider.ts": [
+      "../src/lib/RevoTestProvider.ts": [
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
-        "../src/lib/QtumProvider.ts",
-        "../src/lib/QtumWallet.ts",
+        "../src/lib/RevoProvider.ts",
+        "../src/lib/RevoWallet.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumTransaction.ts": [
+      "../src/lib/RevoTransaction.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
         "../node_modules/@types/bn.js/index.d.ts",
-        "../src/lib/QtumWallet.ts"
+        "../src/lib/RevoWallet.ts"
       ],
-      "../src/lib/QtumWallet.ts": [
+      "../src/lib/RevoWallet.ts": [
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
         "../node_modules/@ethersproject/json-wallets/lib/index.d.ts",
@@ -2468,14 +2460,14 @@
         "../node_modules/bitcoinjs-lib/src/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts",
         "../node_modules/ethers/lib/utils.d.ts",
-        "../src/lib/QtumProvider.ts",
+        "../src/lib/RevoProvider.ts",
         "../src/lib/helpers/IntermediateWallet.ts",
         "../src/lib/helpers/global-vars.ts",
         "../src/lib/helpers/utils.ts"
       ],
       "../src/lib/deployContract.ts": [
         "../src/lib/ContractJSON.ts",
-        "../src/lib/QtumContractFactory.ts"
+        "../src/lib/RevoContractFactory.ts"
       ],
       "../src/lib/helpers/IntermediateWallet.ts": [
         "../node_modules/@ethersproject/abstract-provider/lib/index.d.ts",
@@ -2532,9 +2524,6 @@
       ]
     },
     "exportedModulesMap": {
-      "../../node_modules/varuint-bitcoin/index.d.ts": [
-        "../node_modules/@types/node/index.d.ts"
-      ],
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts": [
         "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
         "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/types.d.ts",
@@ -3494,40 +3483,40 @@
         "../node_modules/@ethersproject/web/lib/index.d.ts"
       ],
       "../src/index.ts": [
-        "../src/lib/QtumContractFactory.ts",
-        "../src/lib/QtumFunctionProvider.ts",
-        "../src/lib/QtumHDKey.ts",
-        "../src/lib/QtumProvider.ts",
-        "../src/lib/QtumTestProvider.ts",
-        "../src/lib/QtumTransaction.ts",
-        "../src/lib/QtumWallet.ts",
+        "../src/lib/RevoContractFactory.ts",
+        "../src/lib/RevoFunctionProvider.ts",
+        "../src/lib/RevoHDKey.ts",
+        "../src/lib/RevoProvider.ts",
+        "../src/lib/RevoTestProvider.ts",
+        "../src/lib/RevoTransaction.ts",
+        "../src/lib/RevoWallet.ts",
         "../src/lib/deployContract.ts",
         "../src/lib/helpers/utils.ts"
       ],
-      "../src/lib/QtumContractFactory.ts": [
+      "../src/lib/RevoContractFactory.ts": [
         "../node_modules/ethers/lib/index.d.ts"
       ],
-      "../src/lib/QtumFunctionProvider.ts": [
-        "../src/lib/QtumProvider.ts"
+      "../src/lib/RevoFunctionProvider.ts": [
+        "../src/lib/RevoProvider.ts"
       ],
-      "../src/lib/QtumHDKey.ts": [
+      "../src/lib/RevoHDKey.ts": [
         "../node_modules/@ethersproject/hdnode/lib/index.d.ts",
-        "../src/lib/QtumWallet.ts"
+        "../src/lib/RevoWallet.ts"
       ],
-      "../src/lib/QtumProvider.ts": [
+      "../src/lib/RevoProvider.ts": [
         "../node_modules/@ethersproject/networks/lib/index.d.ts",
         "../node_modules/@types/ethereum-protocol/index.d.ts",
         "../node_modules/ethers/lib/index.d.ts"
       ],
-      "../src/lib/QtumTestProvider.ts": [
+      "../src/lib/RevoTestProvider.ts": [
         "../node_modules/ethers/lib/index.d.ts",
-        "../src/lib/QtumProvider.ts"
+        "../src/lib/RevoProvider.ts"
       ],
-      "../src/lib/QtumTransaction.ts": [
+      "../src/lib/RevoTransaction.ts": [
         "../node_modules/@types/bn.js/index.d.ts",
-        "../src/lib/QtumWallet.ts"
+        "../src/lib/RevoWallet.ts"
       ],
-      "../src/lib/QtumWallet.ts": [
+      "../src/lib/RevoWallet.ts": [
         "../node_modules/@ethersproject/bytes/lib/index.d.ts",
         "../node_modules/@ethersproject/json-wallets/lib/index.d.ts",
         "../node_modules/@ethersproject/wordlists/lib/index.d.ts",
@@ -3557,7 +3546,6 @@
       ]
     },
     "semanticDiagnosticsPerFile": [
-      "../../node_modules/varuint-bitcoin/index.d.ts",
       "../node_modules/@chainsafe/as-sha256/lib/hashObject.d.ts",
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/gindex.d.ts",
       "../node_modules/@chainsafe/persistent-merkle-tree/lib/hasher/index.d.ts",
@@ -3817,13 +3805,13 @@
       "../node_modules/typescript/lib/lib.esnext.intl.d.ts",
       "../src/index.ts",
       "../src/lib/ContractJSON.ts",
-      "../src/lib/QtumContractFactory.ts",
-      "../src/lib/QtumFunctionProvider.ts",
-      "../src/lib/QtumHDKey.ts",
-      "../src/lib/QtumProvider.ts",
-      "../src/lib/QtumTestProvider.ts",
-      "../src/lib/QtumTransaction.ts",
-      "../src/lib/QtumWallet.ts",
+      "../src/lib/RevoContractFactory.ts",
+      "../src/lib/RevoFunctionProvider.ts",
+      "../src/lib/RevoHDKey.ts",
+      "../src/lib/RevoProvider.ts",
+      "../src/lib/RevoTestProvider.ts",
+      "../src/lib/RevoTransaction.ts",
+      "../src/lib/RevoWallet.ts",
       "../src/lib/deployContract.ts",
       "../src/lib/helpers/IntermediateWallet.ts",
       "../src/lib/helpers/bip66.d.ts",
@@ -3836,8 +3824,8 @@
       "../src/lib/helpers/varuint-bitcoin.d.ts",
       "../src/tests/Adoption.tests.ts",
       "../src/tests/ContractFactory-ContractInteraction.tests.ts",
-      "../src/tests/QtumProvider.tests.ts",
-      "../src/tests/QtumWallet.tests.ts",
+      "../src/tests/RevoProvider.tests.ts",
+      "../src/tests/RevoWallet.tests.ts",
       "../src/tests/Utils.tests.ts"
     ]
   },

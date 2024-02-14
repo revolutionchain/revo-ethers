@@ -28,7 +28,7 @@
     "wif": "^2.0.6"
   },
   "name": "revo-ethers-wrapper",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "main": "./build/main/index.js",
   "license": "",
   "homepage": "https://github.com/revolutionchain/revo-ethers",

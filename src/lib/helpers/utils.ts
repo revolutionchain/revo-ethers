@@ -371,10 +371,10 @@ export async function addVins(
     hash160PubKey: string,
     publicKey: string
 ): Promise<Array<any>> {
-    // minimum gas price is 40 satoshi
-    // minimum sat/kb is 4000
+    // minimum gas price is 1 satoshi
+    // minimum sat/kb is 100
     const gasPrice = BigNumberEthers.from(gasPriceString);
-    const minimumSatoshiPerByte = 400;
+    const minimumSatoshiPerByte = 10;
     if (gasPrice.lt(BigNumberEthers.from(minimumSatoshiPerByte))) {
         throw new Error("Gas price lower than minimum relay fee: " + gasPriceString + " < " + minimumSatoshiPerByte);
     }
